@@ -210,7 +210,7 @@ public class FreeRdpControl : UserControl
             StartInfo =
             {
                 UseShellExecute = true,
-                FileName = "explorer",
+                FileName = freeRdpPath,
                 Arguments = string.Join(" ", arguments).Trim(),
                 WorkingDirectory = Path.GetDirectoryName(freeRdpPath)
             }
@@ -407,9 +407,11 @@ public class FreeRdpControl : UserControl
         if (File.Exists(freeRdpPath) && _executableWritten)
             return;
 
+        var buffer = GetType().Assembly.GetResourceFileAsBytes(WFREERDP_EXE);
+
         File.WriteAllBytes(
             freeRdpPath,
-            GetType().Assembly.GetResourceFileAsBytes(WFREERDP_EXE));
+            buffer);
 
         _executableWritten = true;
     }

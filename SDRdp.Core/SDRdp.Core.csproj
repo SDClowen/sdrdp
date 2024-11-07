@@ -27,6 +27,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="Resources\wfreerdp.exe" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Resources\wfreerdp.exe" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
         <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106">
             <PrivateAssets>all</PrivateAssets>
