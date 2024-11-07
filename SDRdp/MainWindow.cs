@@ -105,20 +105,23 @@ public partial class MainWindow : UIWindow
         //if (File.Exists(fileName))
         //return;
 
-        var exists = false;
+        var found = false;
         foreach (ToolStripMenuItem item in savedConnections.DropDownItems)
         {
             var configuration = item.Tag as FreeRdpConfiguration;
             if (configuration.Server == freeRdpControl.Configuration.Server &&
                 configuration.Username == freeRdpControl.Configuration.Username)
-                exists = true;
+            {
+                found = true;
+                break;
+            }
         }
 
-        if (!exists)
+        if (!found)
         {
             var menuItem = new ToolStripMenuItem()
             {
-                Text = title,
+                Text = freeRdpControl.Configuration.Title,
                 Tag = freeRdpControl.Configuration,
             };
 
@@ -146,6 +149,12 @@ public partial class MainWindow : UIWindow
             var configuration = menuItem.Tag as FreeRdpConfiguration;
             if (configuration == null)
                 return;
+
+            configuration.DesktopScaleFactor = DeviceDpi / 96 * 100;
+            configuration.DesktopWidth = 0;
+            configuration.DesktopHeight = 0;
+            configuration.SmartReconnect = false;
+            configuration.WindowDrag = true;
 
             var freeRdpControl = new FreeRdpControl();
             freeRdpControl.Configuration = configuration;
@@ -267,7 +276,9 @@ public partial class MainWindow : UIWindow
             return;
 
         _propertyGrid.SelectedObject = _freeRdpControl?.Configuration;
-        _form.Show(this);
+        
+        if(!_form.Visible)
+            _form.Show(this);
     }
 
     private void FreeRdpControl_Connected(object sender, EventArgs e)
@@ -406,7 +417,7 @@ public partial class MainWindow : UIWindow
                 TopMost = true;
                 this.WindowState = FormWindowState.Normal;
                 this.FormBorderStyle = FormBorderStyle.None;
-                this.Bounds = Screen.PrimaryScreen.Bounds;
+                this.Bounds = Screen.FromControl(this).Bounds;
                 panelFullScreen.Visible = true;
             }
             else
