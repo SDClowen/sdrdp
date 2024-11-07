@@ -1,0 +1,12 @@
+AssignProcessToJobObject
+CreateJobObject
+SetInformationJobObject
+
+EnumChildWindows
+GetClassName
+
+SendMessage
+WM_SETFOCUS
+WM_MOUSEACTIVATE
+
+JOBOBJECT_EXTENDED_LIMIT_INFORMATION

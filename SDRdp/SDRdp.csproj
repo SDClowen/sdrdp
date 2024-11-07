@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Product>SDRdp</Product>
+		<Nullable>enable</Nullable>
+		<Copyright>Copyright © $([System.DateTime]::Now.ToString(yyyy)), Mahmut YILDIRIM a.k.a SDClowen</Copyright>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<UseWindowsForms>true</UseWindowsForms>
+		<StartupObject>SDRdp.Program</StartupObject>
+		<OutputType>WinExe</OutputType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Ookii.Dialogs.WinForms" Version="4.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SDRdp.Core\SDRdp.Core.csproj" />
+		<ProjectReference Include="..\sdui\SDUI\SDUI.csproj" />
+	</ItemGroup>
+
+</Project>
