@@ -52,9 +52,9 @@
     System.Drawing.Color.MidnightBlue
     };
             label1.GradientAnimation = false;
-            label1.Location = new System.Drawing.Point(109, 32);
+            label1.Location = new System.Drawing.Point(64, 17);
             label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(413, 142);
+            label1.Size = new System.Drawing.Size(517, 177);
             label1.TabIndex = 0;
             label1.Text = "SDRdp";
             // 
@@ -72,7 +72,7 @@
             label2.GradientAnimation = false;
             label2.Location = new System.Drawing.Point(130, 174);
             label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(278, 20);
+            label2.Size = new System.Drawing.Size(355, 25);
             label2.TabIndex = 1;
             label2.Text = "Easy-to-use remote connection manager";
             // 
@@ -90,7 +90,7 @@
             label3.GradientAnimation = false;
             label3.Location = new System.Drawing.Point(481, 32);
             label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(41, 17);
+            label3.Size = new System.Drawing.Size(53, 23);
             label3.TabIndex = 2;
             label3.Text = "v1.0.0";
             // 
@@ -127,7 +127,7 @@
             buttonGithub.Name = "buttonGithub";
             buttonGithub.Radius = 6;
             buttonGithub.ShadowDepth = 4F;
-            buttonGithub.Size = new System.Drawing.Size(132, 36);
+            buttonGithub.Size = new System.Drawing.Size(156, 36);
             buttonGithub.TabIndex = 4;
             buttonGithub.Text = "Github Sponsor";
             buttonGithub.UseVisualStyleBackColor = true;
@@ -137,11 +137,11 @@
             // 
             buttonBuymeacoffee.Color = System.Drawing.Color.Yellow;
             buttonBuymeacoffee.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 162);
-            buttonBuymeacoffee.Location = new System.Drawing.Point(228, 367);
+            buttonBuymeacoffee.Location = new System.Drawing.Point(252, 367);
             buttonBuymeacoffee.Name = "buttonBuymeacoffee";
             buttonBuymeacoffee.Radius = 6;
             buttonBuymeacoffee.ShadowDepth = 4F;
-            buttonBuymeacoffee.Size = new System.Drawing.Size(180, 36);
+            buttonBuymeacoffee.Size = new System.Drawing.Size(156, 36);
             buttonBuymeacoffee.TabIndex = 4;
             buttonBuymeacoffee.Text = "Buymeacoffee";
             buttonBuymeacoffee.UseVisualStyleBackColor = true;
@@ -164,7 +164,7 @@
             // 
             // AboutForm
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             ClientSize = new System.Drawing.Size(631, 418);
             Controls.Add(buttonPatreon);

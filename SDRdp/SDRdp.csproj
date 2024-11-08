@@ -12,7 +12,12 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<StartupObject>SDRdp.Program</StartupObject>
 		<OutputType>WinExe</OutputType>
+		<ApplicationIcon>app.ico</ApplicationIcon>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Include="app.ico" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Ookii.Dialogs.WinForms" Version="4.0.0" />

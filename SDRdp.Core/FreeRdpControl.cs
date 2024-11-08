@@ -31,7 +31,7 @@ public class FreeRdpControl : UserControl
     private Size _previousClientSize = Size.Empty;
     private Process? _process;
     private IntPtr _freeRdpWindowHandle = IntPtr.Zero;
-    
+
     private int _initialZoomFactor = 100;
     private int _initialDesktopWidth = -1;
     private int _initialDesktopHeight = -1;
@@ -120,7 +120,7 @@ public class FreeRdpControl : UserControl
                     _renderTarget.Focus();
                     SetFocusToFreeRdpWindow();
                 }
-                break;                
+                break;
             case PInvoke.WM_SETFOCUS:
                 SetFocusToFreeRdpWindow();
                 break;
@@ -158,19 +158,18 @@ public class FreeRdpControl : UserControl
     /// </summary>
     public void Connect()
     {
-        if (_process is {HasExited: false})
+        if (_process is { HasExited: false })
             return;
 
         _freeRdpWindowHandle = IntPtr.Zero;
-        
-        ApplyAutoScaling();
 
-        if (Configuration.DesktopWidth == 0 || Configuration.DesktopHeight == 0)
-        {
+        if (Configuration.DesktopWidth == 0)
             Configuration.DesktopWidth = ClientSize.Width;
-            Configuration.DesktopHeight = ClientSize.Height;
-        }
 
+        if (Configuration.DesktopHeight == 0)
+            Configuration.DesktopHeight = ClientSize.Height;
+
+        ApplyAutoScaling();
         Configuration.ParentWindow = _renderTarget.Handle.ToInt64();
 
         // calculate the size of the render target based on the remote desktop size
@@ -179,6 +178,7 @@ public class FreeRdpControl : UserControl
         _renderTarget.Size = new Size(Configuration.DesktopWidth, Configuration.DesktopHeight);
         _renderTarget.MinimumSize = _renderTarget.Size;
         _renderTarget.MaximumSize = _renderTarget.Size;
+
         // calculate position, since anchor and dock is none, it will be kept in center
         _renderTarget.Location = new Point(
             ClientSize.Width / 2 - _renderTarget.Width / 2,
@@ -188,7 +188,7 @@ public class FreeRdpControl : UserControl
 
         // AutoScrollMinSize is required to get scrollbars to appear
         AutoScrollMinSize = _renderTarget.Size;
-        
+
         var freeRdpPath = Path.Combine(Environment.CurrentDirectory, WFREERDP_EXE);
         if (!string.IsNullOrWhiteSpace(Configuration.Executable))
         {
@@ -203,7 +203,7 @@ public class FreeRdpControl : UserControl
             VerifyExecutable(freeRdpPath);
         }
 
-        var arguments = Configuration.GetArguments().Where(a => a.Any());
+        var arguments = Configuration.GetArguments().Where(a => a.Length != 0);
         _process = new Process
         {
             EnableRaisingEvents = true,
@@ -217,7 +217,7 @@ public class FreeRdpControl : UserControl
         };
 
         Logger.LogTrace("Starting wfreerdp.exe {Arguments}", _process.StartInfo.Arguments);
-        
+
         _process.Exited += Process_Exited;
         _process.Start();
 
@@ -232,7 +232,7 @@ public class FreeRdpControl : UserControl
     public void Disconnect()
     {
         KillProcess();
-        OnDisconnected(new DisconnectEventArgs(0) {UserInitiated = true});
+        OnDisconnected(new DisconnectEventArgs(0) { UserInitiated = true });
     }
 
     /// <summary>
@@ -352,7 +352,7 @@ public class FreeRdpControl : UserControl
 
         Configuration.DesktopWidth = _initialDesktopWidth;
         Configuration.DesktopHeight = _initialDesktopHeight;
-        OnDisconnected(new DisconnectEventArgs((uint) exitCode));
+        OnDisconnected(new DisconnectEventArgs((uint)exitCode));
     }
 
     private void TimerResizeInProgress_Tick(object? sender, EventArgs e)
@@ -373,8 +373,8 @@ public class FreeRdpControl : UserControl
 
     private void ApplyAutoScaling()
     {
-        Configuration.DesktopWidth = (int) (Configuration.DesktopWidth * GetDpiScalingFactor());
-        Configuration.DesktopHeight = (int) (Configuration.DesktopHeight * GetDpiScalingFactor());
+        Configuration.DesktopWidth = (int)(Configuration.DesktopWidth * GetDpiScalingFactor());
+        Configuration.DesktopHeight = (int)(Configuration.DesktopHeight * GetDpiScalingFactor());
 
         if (_initialDesktopWidth < 0)
             _initialDesktopWidth = Configuration.DesktopWidth;
@@ -417,7 +417,7 @@ public class FreeRdpControl : UserControl
     }
 
     private double GetDpiScalingFactor() => DeviceDpi / 96.0;
-    private int GetDpiScalingInPercent() => (int) GetDpiScalingFactor() * 100;
+    private int GetDpiScalingInPercent() => (int)GetDpiScalingFactor() * 100;
 
     private void KillProcess()
     {
@@ -426,7 +426,7 @@ public class FreeRdpControl : UserControl
 
         if (_process == null)
             return;
-        
+
         try
         {
             _process.Exited -= Process_Exited;
@@ -467,7 +467,7 @@ public class FreeRdpControl : UserControl
         {
             if (IsDisposed)
                 return;
-            
+
             Invoke(OnDisconnected, disconnectEventArgs);
             return;
         }
@@ -511,7 +511,7 @@ public class FreeRdpControl : UserControl
         KillProcess();
         Connect();
     }
-    
+
     private void SetFocusToFreeRdpWindow()
     {
         if (_freeRdpWindowHandle == IntPtr.Zero)

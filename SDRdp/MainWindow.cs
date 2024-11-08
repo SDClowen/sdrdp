@@ -48,6 +48,10 @@ public partial class MainWindow : UIWindow
         {
             Dock = DockStyle.Fill
         };
+
+        var screen = Screen.FromControl(this);
+        Width = screen.WorkingArea.Width * 80 / 100;
+        Height = screen.WorkingArea.Height * 85 / 100;
     }
 
     private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
@@ -100,7 +104,7 @@ public partial class MainWindow : UIWindow
     {
         var title = $"{freeRdpControl.Configuration.Server}@{freeRdpControl.Configuration.Username}";
         var savedDir = Path.Combine(Environment.CurrentDirectory, "saved");
-        var fileName = Path.Combine(savedDir, $"{freeRdpControl.Configuration.Server}_{freeRdpControl.Configuration.Username}.json");
+        var fileName = Path.Combine(savedDir, $"{freeRdpControl.Configuration.Server.Replace(":", "_")}_{freeRdpControl.Configuration.Username}.json");
 
         //if (File.Exists(fileName))
         //return;
@@ -165,7 +169,7 @@ public partial class MainWindow : UIWindow
 
 
             freeRdpControl.Dock = DockStyle.Fill;
-
+            freeRdpControl.ClientSize = pageController.ClientSize;
             freeRdpControl.Connect();
         }
         catch (Exception ex)
@@ -197,7 +201,18 @@ public partial class MainWindow : UIWindow
                     string.IsNullOrWhiteSpace(inputDialog.Input))
                     return;
 
-                freeRdpControl.Configuration.Server = inputDialog.Input;
+                var server = inputDialog.Input;
+                var port = 3389;
+
+                var index = server.LastIndexOf(':');
+                if (index != -1)
+                {
+                    port = Convert.ToInt32(server.Substring(index + 1));
+                    server = server.Substring(0, index);
+                }
+
+                freeRdpControl.Configuration.Server = server;
+                freeRdpControl.Configuration.Port = port;
             }
 
             if (string.IsNullOrEmpty(freeRdpControl.Configuration.Username) ||
