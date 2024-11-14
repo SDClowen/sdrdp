@@ -6,11 +6,8 @@
         <Copyright>Copyright © $([System.DateTime]::Now.ToString(yyyy)), Mahmut YILDIRIM a.k.a SDClowen</Copyright>
         <PackageProjectUrl>https://github.com/sdclowen/sdrdp</PackageProjectUrl>
         <RepositoryUrl>https://github.com/sdclowen/sdrdp</RepositoryUrl>
-        <Nullable>enable</Nullable>
+        <Nullable>disable</Nullable>
         <LangVersion>10</LangVersion>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>$(NoWarn);CS8981;NU1701</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>

@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using SDRdp.Core.Configuration;
+using SDRdp.Core.Extensions;
+using SDRdp.Core.Logging;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Diagnostics;
@@ -7,10 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Windows.Win32;
-using Microsoft.Extensions.Logging;
-using SDRdp.Core.Configuration;
-using SDRdp.Core.Extensions;
-using SDRdp.Core.Logging;
 
 namespace SDRdp.Core;
 
@@ -22,7 +22,7 @@ public class FreeRdpControl : UserControl
 {
     private static bool _executableWritten;
 
-    private static readonly ProcessJobTracker ProcessJobTracker = new("sdclowen_wfreerdp");
+    private static readonly ProcessJobTracker ProcessJobTracker = new("sdrdp_wfreerdp");
 
     private const string WFREERDP_EXE = "wfreerdp.exe";
 
@@ -33,14 +33,11 @@ public class FreeRdpControl : UserControl
     private IntPtr _freeRdpWindowHandle = IntPtr.Zero;
 
     private int _initialZoomFactor = 100;
+    public int Zoom = 100;
     private int _initialDesktopWidth = -1;
     private int _initialDesktopHeight = -1;
-
-    /// <summary>
-    /// Get zoom level
-    /// </summary>
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public int Zoom { get; private set; } = 100;
+    private float _dpiFactor => DeviceDpi / 96.0f;
+    private int _dpiPercent => (int)(_dpiFactor * 100);
 
     /// <summary>
     /// FreeRDP configuration settings 
@@ -90,6 +87,7 @@ public class FreeRdpControl : UserControl
         {
             Interval = 1000
         };
+
         _timerResizeInProgress.Tick += TimerResizeInProgress_Tick;
     }
 
@@ -163,13 +161,12 @@ public class FreeRdpControl : UserControl
 
         _freeRdpWindowHandle = IntPtr.Zero;
 
-        if (Configuration.DesktopWidth == 0)
+        if (Configuration.DesktopWidth == 0 || Configuration.DesktopHeight == 0)
+        {
             Configuration.DesktopWidth = ClientSize.Width;
-
-        if (Configuration.DesktopHeight == 0)
             Configuration.DesktopHeight = ClientSize.Height;
+        }
 
-        ApplyAutoScaling();
         Configuration.ParentWindow = _renderTarget.Handle.ToInt64();
 
         // calculate the size of the render target based on the remote desktop size
@@ -178,16 +175,14 @@ public class FreeRdpControl : UserControl
         _renderTarget.Size = new Size(Configuration.DesktopWidth, Configuration.DesktopHeight);
         _renderTarget.MinimumSize = _renderTarget.Size;
         _renderTarget.MaximumSize = _renderTarget.Size;
-
         // calculate position, since anchor and dock is none, it will be kept in center
-        _renderTarget.Location = new Point(
-            ClientSize.Width / 2 - _renderTarget.Width / 2,
-            ClientSize.Height / 2 - _renderTarget.Height / 2);
+        _renderTarget.Location = new(ClientSize.Width / 2 - _renderTarget.Width / 2, ClientSize.Height / 2 - _renderTarget.Height / 2);
 
         _previousClientSize = ClientSize;
 
         // AutoScrollMinSize is required to get scrollbars to appear
         AutoScrollMinSize = _renderTarget.Size;
+        ApplyAutoScaling();
 
         var freeRdpPath = Path.Combine(Environment.CurrentDirectory, WFREERDP_EXE);
         if (!string.IsNullOrWhiteSpace(Configuration.Executable))
@@ -209,10 +204,10 @@ public class FreeRdpControl : UserControl
             EnableRaisingEvents = true,
             StartInfo =
             {
-                UseShellExecute = true,
+                UseShellExecute = false,
                 FileName = freeRdpPath,
                 Arguments = string.Join(" ", arguments).Trim(),
-                WorkingDirectory = Path.GetDirectoryName(freeRdpPath)
+                WorkingDirectory = Environment.ExpandEnvironmentVariables(Configuration.TempPath)
             }
         };
 
@@ -287,6 +282,7 @@ public class FreeRdpControl : UserControl
             450 => 500,
             _ => 100
         };
+
         SetZoomLevel(newScaleFactor);
     }
 
@@ -373,18 +369,24 @@ public class FreeRdpControl : UserControl
 
     private void ApplyAutoScaling()
     {
-        Configuration.DesktopWidth = (int)(Configuration.DesktopWidth * GetDpiScalingFactor());
-        Configuration.DesktopHeight = (int)(Configuration.DesktopHeight * GetDpiScalingFactor());
+        Configuration.DesktopWidth = (int)(Configuration.DesktopWidth * _dpiFactor);
+        Configuration.DesktopHeight = (int)(Configuration.DesktopHeight * _dpiFactor);
 
-        if (_initialDesktopWidth < 0)
+        if (_initialDesktopWidth <= 0)
             _initialDesktopWidth = Configuration.DesktopWidth;
-        if (_initialDesktopHeight < 0)
+        if (_initialDesktopHeight <= 0)
             _initialDesktopHeight = Configuration.DesktopHeight;
 
         if (!Configuration.AutoScaling)
             return;
 
-        Configuration.DesktopScaleFactor = EnsureScalingInRange(GetDpiScalingInPercent());
+        Configuration.DesktopScaleFactor = _dpiPercent switch
+        {
+            < 100 => 100,
+            > 500 => 500,
+            _ => _dpiPercent
+        };
+
         Configuration.DeviceScaleFactor = Configuration.DesktopScaleFactor switch
         {
             <= 100 => 100,
@@ -395,29 +397,17 @@ public class FreeRdpControl : UserControl
         _initialZoomFactor = Zoom = Configuration.DesktopScaleFactor;
     }
 
-    private int EnsureScalingInRange(int scalingFactor) => scalingFactor switch
-    {
-        < 100 => 100,
-        > 500 => 500,
-        _ => scalingFactor
-    };
-
     private void VerifyExecutable(string freeRdpPath)
     {
         if (File.Exists(freeRdpPath) && _executableWritten)
             return;
 
-        var buffer = GetType().Assembly.GetResourceFileAsBytes(WFREERDP_EXE);
-
         File.WriteAllBytes(
             freeRdpPath,
-            buffer);
+            GetType().Assembly.GetResourceFileAsBytes(WFREERDP_EXE));
 
         _executableWritten = true;
     }
-
-    private double GetDpiScalingFactor() => DeviceDpi / 96.0;
-    private int GetDpiScalingInPercent() => (int)GetDpiScalingFactor() * 100;
 
     private void KillProcess()
     {

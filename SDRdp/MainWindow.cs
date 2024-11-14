@@ -16,8 +16,8 @@ namespace SDRdp;
 
 public partial class MainWindow : UIWindow
 {
-    public static readonly Color LightThemeColor = Color.FromArgb(255, 255, 255);
-    public static readonly Color DarkThemeColor = Color.FromArgb(16, 16, 16);
+    private static readonly Color _lightBackColor = Color.FromArgb(255, 255, 255);
+    private static readonly Color _darkBackColor = Color.FromArgb(16, 16, 16);
 
     private FreeRdpControl _freeRdpControl => pageController.SelectedIndex < 0 ? null :
             pageController.Controls[pageController.SelectedIndex] as FreeRdpControl;
@@ -41,6 +41,9 @@ public partial class MainWindow : UIWindow
         _form.Closing += (_, args) =>
         {
             _form.Hide();
+
+            CheckIsSaved(_freeRdpControl);
+
             args.Cancel = true;
         };
 
@@ -52,6 +55,8 @@ public partial class MainWindow : UIWindow
         var screen = Screen.FromControl(this);
         Width = screen.WorkingArea.Width * 80 / 100;
         Height = screen.WorkingArea.Height * 85 / 100;
+
+        Gradient = [Color.DarkBlue, Color.MidnightBlue];
     }
 
     private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
@@ -61,13 +66,13 @@ public partial class MainWindow : UIWindow
 
         if (WindowsHelper.IsDark())
         {
-            ColorScheme.BackColor = DarkThemeColor;
-            BackColor = DarkThemeColor;
+            ColorScheme.BackColor = _darkBackColor;
+            BackColor = _darkBackColor;
         }
         else
         {
-            ColorScheme.BackColor = LightThemeColor;
-            BackColor = LightThemeColor;
+            ColorScheme.BackColor = _lightBackColor;
+            BackColor = _lightBackColor;
         }
     }
 
@@ -116,6 +121,9 @@ public partial class MainWindow : UIWindow
             if (configuration.Server == freeRdpControl.Configuration.Server &&
                 configuration.Username == freeRdpControl.Configuration.Username)
             {
+                item.Tag = freeRdpControl.Configuration;
+                item.Text = freeRdpControl.Text = freeRdpControl.Configuration.Title;
+
                 found = true;
                 break;
             }
@@ -137,7 +145,9 @@ public partial class MainWindow : UIWindow
         if (!Directory.Exists(savedDir))
             Directory.CreateDirectory(savedDir);
 
-        var serialized = JsonSerializer.Serialize<FreeRdpConfiguration>(freeRdpControl.Configuration);
+        var freeRdpControlConfiguration = freeRdpControl.Configuration;
+        //freeRdpControlConfiguration.DesktopHeight = freeRdpControlConfiguration.DesktopWidth = 0;
+        var serialized = JsonSerializer.Serialize(freeRdpControlConfiguration);
 
         File.WriteAllText(fileName, serialized);
     }
@@ -154,22 +164,20 @@ public partial class MainWindow : UIWindow
             if (configuration == null)
                 return;
 
-            configuration.DesktopScaleFactor = DeviceDpi / 96 * 100;
-            configuration.DesktopWidth = 0;
-            configuration.DesktopHeight = 0;
-            configuration.SmartReconnect = false;
-            configuration.WindowDrag = true;
-
             var freeRdpControl = new FreeRdpControl();
             freeRdpControl.Configuration = configuration;
             freeRdpControl.Connected += FreeRdpControl_Connected;
             freeRdpControl.Disconnected += FreeRdpControl_Disconnected;
             freeRdpControl.VerifyCredentials += FreeRdpControl_VerifyCredentials;
             freeRdpControl.CertificateError += FreeRdpControl_CertificateError;
-
-
             freeRdpControl.Dock = DockStyle.Fill;
-            freeRdpControl.ClientSize = pageController.ClientSize;
+
+            freeRdpControl.Configuration.DesktopWidth = pageController.Width;
+            freeRdpControl.Configuration.DesktopHeight = pageController.Height;
+
+            pageController.Controls.Add(freeRdpControl);
+            pageController.SelectedIndex = pageController.Count - 1;
+
             freeRdpControl.Connect();
         }
         catch (Exception ex)
@@ -183,7 +191,6 @@ public partial class MainWindow : UIWindow
         try
         {
             var freeRdpControl = new FreeRdpControl();
-            freeRdpControl.Configuration.AutoScaling = true;
             freeRdpControl.Connected += FreeRdpControl_Connected;
             freeRdpControl.Disconnected += FreeRdpControl_Disconnected;
             freeRdpControl.VerifyCredentials += FreeRdpControl_VerifyCredentials;
@@ -240,6 +247,11 @@ public partial class MainWindow : UIWindow
                 return;
 
             freeRdpControl.Configuration.Title = inputDialogTitle.Input;
+            freeRdpControl.Configuration.DesktopWidth = pageController.Width;
+            freeRdpControl.Configuration.DesktopHeight = pageController.Height;
+
+            pageController.Controls.Add(freeRdpControl);
+            pageController.SelectedIndex = pageController.Count - 1;
 
             freeRdpControl.Connect();
 
@@ -291,8 +303,8 @@ public partial class MainWindow : UIWindow
             return;
 
         _propertyGrid.SelectedObject = _freeRdpControl?.Configuration;
-        
-        if(!_form.Visible)
+
+        if (!_form.Visible)
             _form.Show(this);
     }
 
@@ -305,8 +317,6 @@ public partial class MainWindow : UIWindow
                 $"{freeRdpControl.Configuration.Server}@{freeRdpControl.Configuration.Username}" :
                 freeRdpControl.Configuration.Title;
 
-            pageController.Controls.Add(freeRdpControl);
-            this.Invalidate();
 
             foreach (ToolStripMenuItem item in savedConnections.DropDownItems)
             {
@@ -320,8 +330,6 @@ public partial class MainWindow : UIWindow
 
             if (pageController.Count == 1)
                 Text = $"{_freeRdpControl.Configuration.Server}@{_freeRdpControl.Configuration.Username}";
-
-            DisconnectMenuItem.Enabled = !labelStarting.Visible;
         }
         catch (Exception ex)
         {
@@ -349,7 +357,6 @@ public partial class MainWindow : UIWindow
             }
 
             labelStarting.Visible = pageController.Controls.Count == 0;
-            DisconnectMenuItem.Enabled = !labelStarting.Visible;
 
             if (!labelStarting.Visible)
                 pageController.SelectedIndex--;
@@ -406,7 +413,7 @@ public partial class MainWindow : UIWindow
 
         _propertyGrid.SelectedObject = _freeRdpControl.Configuration;
         Text = $"{_freeRdpControl.Configuration.Server}@{_freeRdpControl.Configuration.Username}";
-        ResetZoomMenuItem.Text = $"&Reset Zoom (${_freeRdpControl.Zoom}%)";
+        ResetZoomMenuItem.Text = $"&Reset Zoom ({_freeRdpControl.Zoom}%)";
     }
 
     private void FreeRdpForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -434,15 +441,22 @@ public partial class MainWindow : UIWindow
                 this.FormBorderStyle = FormBorderStyle.None;
                 this.Bounds = Screen.FromControl(this).Bounds;
                 panelFullScreen.Visible = true;
+                panelFullScreen.Location = new Point(Width / 2 - panelFullScreen.Width / 2, 0);
+                panelFullScreen.BringToFront();
             }
             else
             {
                 panelFullScreen.Visible = false;
                 TopMost = false;
                 ShowTitle = true;
-                this.WindowState = FormWindowState.Maximized;
+                var screen = Screen.FromControl(this);
+                Width = screen.WorkingArea.Width * 80 / 100;
+                Height = screen.WorkingArea.Height * 85 / 100;
+                this.WindowState = FormWindowState.Normal;
                 this.FormBorderStyle = FormBorderStyle.Sizable;
             }
+
+            _freeRdpControl.Configuration.SmartReconnect = false;
         }
         catch (Exception ex)
         {
@@ -485,5 +499,19 @@ public partial class MainWindow : UIWindow
     private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
     {
         new AboutForm().ShowDialog(this);
+    }
+
+    private void MainWindow_OnCloseTabBoxClick(object sender, int pageIndex)
+    {
+        if (pageController.Controls.Count == 0)
+            return;
+
+        var freeRdpControl = pageController.Controls[pageIndex] as FreeRdpControl;
+        freeRdpControl?.Disconnect();
+    }
+
+    private void panelFullScreen_MouseHover(object sender, EventArgs e)
+    {
+        panelFullScreen.Visible = true;
     }
 }
