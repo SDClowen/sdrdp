@@ -56,7 +56,7 @@ public partial class MainWindow : UIWindow
         Width = screen.WorkingArea.Width * 80 / 100;
         Height = screen.WorkingArea.Height * 85 / 100;
 
-        Gradient = [Color.DarkBlue, Color.MidnightBlue];
+        //Gradient = [ColorTranslator.FromHtml("#0968e5"), ColorTranslator.FromHtml("#091970")];
     }
 
     private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
@@ -115,7 +115,7 @@ public partial class MainWindow : UIWindow
         //return;
 
         var found = false;
-        foreach (ToolStripMenuItem item in savedConnections.DropDownItems)
+        foreach (ToolStripMenuItem item in formMenuStrip.Items)
         {
             var configuration = item.Tag as FreeRdpConfiguration;
             if (configuration.Server == freeRdpControl.Configuration.Server &&
@@ -139,7 +139,7 @@ public partial class MainWindow : UIWindow
 
             menuItem.Click += SavedConnections_ConnectMenuItem_Click;
 
-            savedConnections.DropDownItems.Add(menuItem);
+            formMenuStrip.Items.Add(menuItem);
         }
 
         if (!Directory.Exists(savedDir))
@@ -318,7 +318,7 @@ public partial class MainWindow : UIWindow
                 freeRdpControl.Configuration.Title;
 
 
-            foreach (ToolStripMenuItem item in savedConnections.DropDownItems)
+            foreach (ToolStripMenuItem item in formMenuStrip.Items)
             {
                 var configuration = item.Tag as FreeRdpConfiguration;
                 if (configuration.Server == freeRdpControl.Configuration.Server &&
@@ -348,7 +348,7 @@ public partial class MainWindow : UIWindow
             if (pageController.Count == 0)
                 Text = "SDRdp - Not Connected";
 
-            foreach (ToolStripMenuItem item in savedConnections.DropDownItems)
+            foreach (ToolStripMenuItem item in formMenuStrip.Items)
             {
                 var configuration = item.Tag as FreeRdpConfiguration;
                 if (configuration.Server == freeRdpControl.Configuration.Server &&
@@ -487,7 +487,7 @@ public partial class MainWindow : UIWindow
 
                 menuItem.Click += SavedConnections_ConnectMenuItem_Click;
 
-                savedConnections.DropDownItems.Add(menuItem);
+                formMenuStrip.Items.Add(menuItem);
             }
         }
         catch (Exception ex)

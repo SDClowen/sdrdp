@@ -37,7 +37,6 @@
             Separator1 = new System.Windows.Forms.ToolStripSeparator();
             SettingsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            savedConnections = new System.Windows.Forms.ToolStripMenuItem();
             aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ConnectionMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,6 +45,7 @@
             panelFullScreen = new System.Windows.Forms.Panel();
             label1 = new System.Windows.Forms.Label();
             buttonExitFullScreen = new SDUI.Controls.Button();
+            formMenuStrip = new SDUI.Controls.ContextMenuStrip();
             MenuStrip.SuspendLayout();
             panelFullScreen.SuspendLayout();
             SuspendLayout();
@@ -54,9 +54,9 @@
             // 
             MenuStrip.Font = new System.Drawing.Font("Segoe UI", 10.2F);
             MenuStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            MenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { ZoomInMenuItem, ZoomOutMenuItem, ResetZoomMenuItem, fullScreenToolStripMenuItem, Separator1, SettingsMenuItem, toolStripSeparator1, savedConnections, aboutToolStripMenuItem, exitToolStripMenuItem });
+            MenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { ZoomInMenuItem, ZoomOutMenuItem, ResetZoomMenuItem, fullScreenToolStripMenuItem, Separator1, SettingsMenuItem, toolStripSeparator1, aboutToolStripMenuItem, exitToolStripMenuItem });
             MenuStrip.Name = "MenuStrip";
-            MenuStrip.Size = new System.Drawing.Size(211, 208);
+            MenuStrip.Size = new System.Drawing.Size(211, 184);
             MenuStrip.Text = "menuStrip1";
             // 
             // ZoomInMenuItem
@@ -108,13 +108,6 @@
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
             toolStripSeparator1.Size = new System.Drawing.Size(207, 6);
-            // 
-            // savedConnections
-            // 
-            savedConnections.ForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
-            savedConnections.Name = "savedConnections";
-            savedConnections.Size = new System.Drawing.Size(210, 24);
-            savedConnections.Text = "Saved Connections";
             // 
             // aboutToolStripMenuItem
             // 
@@ -211,27 +204,33 @@
             buttonExitFullScreen.UseVisualStyleBackColor = true;
             buttonExitFullScreen.Click += buttonFullScreen_Click;
             // 
+            // formMenuStrip
+            // 
+            formMenuStrip.Name = "formMenuStrip";
+            formMenuStrip.Size = new System.Drawing.Size(61, 4);
+            // 
             // MainWindow
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            BorderColor = System.Drawing.Color.RoyalBlue;
             ClientSize = new System.Drawing.Size(1288, 682);
             Controls.Add(panelFullScreen);
             Controls.Add(labelStarting);
             Controls.Add(pageController);
+            DrawTabIcons = true;
+            DrawTitleBorder = false;
             ExtendBox = true;
             ExtendMenu = MenuStrip;
-            Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 162);
+            Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 162);
+            FormMenu = formMenuStrip;
             Hatch = System.Drawing.Drawing2D.HatchStyle.Percent90;
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
             IconWidth = 48F;
-            Location = new System.Drawing.Point(0, 0);
             Margin = new System.Windows.Forms.Padding(2);
             Name = "MainWindow";
             NewTabButton = true;
             Padding = new System.Windows.Forms.Padding(1, 38, 1, 1);
-            StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            ShowMenuInsteadOfIcon = true;
             TabCloseButton = true;
             Text = "SDRdp - Not Connected";
             TitleHeight = 38F;
@@ -257,11 +256,11 @@
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem fullScreenToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripMenuItem savedConnections;
         private SDUI.Controls.Label labelStarting;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.Panel panelFullScreen;
         private System.Windows.Forms.Label label1;
         private SDUI.Controls.Button buttonExitFullScreen;
+        private SDUI.Controls.ContextMenuStrip formMenuStrip;
     }
 }

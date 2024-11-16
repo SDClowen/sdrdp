@@ -369,8 +369,8 @@ public class FreeRdpControl : UserControl
 
     private void ApplyAutoScaling()
     {
-        Configuration.DesktopWidth = (int)(Configuration.DesktopWidth * _dpiFactor);
-        Configuration.DesktopHeight = (int)(Configuration.DesktopHeight * _dpiFactor);
+        //Configuration.DesktopWidth = (int)(Configuration.DesktopWidth * _dpiFactor);
+        //Configuration.DesktopHeight = (int)(Configuration.DesktopHeight * _dpiFactor);
 
         if (_initialDesktopWidth <= 0)
             _initialDesktopWidth = Configuration.DesktopWidth;
@@ -508,5 +508,12 @@ public class FreeRdpControl : UserControl
             _freeRdpWindowHandle = WindowHelper.GetFreeRdpWindow(_renderTarget.Handle);
 
         WindowHelper.SendFocusMessage(_freeRdpWindowHandle);
+    }
+
+    protected override void OnDpiChangedAfterParent(EventArgs e)
+    {
+        base.OnDpiChangedAfterParent(e);
+
+        Reconnect();
     }
 }
