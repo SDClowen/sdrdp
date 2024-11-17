@@ -52,7 +52,7 @@
     System.Drawing.Color.MidnightBlue
     };
             label1.GradientAnimation = false;
-            label1.Location = new System.Drawing.Point(64, 17);
+            label1.Location = new System.Drawing.Point(64, 40);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(517, 177);
             label1.TabIndex = 0;
@@ -70,7 +70,7 @@
     System.Drawing.Color.DarkGray
     };
             label2.GradientAnimation = false;
-            label2.Location = new System.Drawing.Point(130, 174);
+            label2.Location = new System.Drawing.Point(90, 192);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(355, 25);
             label2.TabIndex = 1;
@@ -88,7 +88,7 @@
     System.Drawing.Color.Black
     };
             label3.GradientAnimation = false;
-            label3.Location = new System.Drawing.Point(481, 32);
+            label3.Location = new System.Drawing.Point(528, 40);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(53, 23);
             label3.TabIndex = 2;
@@ -100,12 +100,12 @@
             panel1.Border = new System.Windows.Forms.Padding(0, 0, 0, 0);
             panel1.BorderColor = System.Drawing.Color.Transparent;
             panel1.Controls.Add(richTextBox1);
-            panel1.Location = new System.Drawing.Point(90, 197);
+            panel1.Location = new System.Drawing.Point(39, 235);
             panel1.Name = "panel1";
             panel1.Padding = new System.Windows.Forms.Padding(5);
             panel1.Radius = 14;
             panel1.ShadowDepth = 12F;
-            panel1.Size = new System.Drawing.Size(456, 164);
+            panel1.Size = new System.Drawing.Size(542, 190);
             panel1.TabIndex = 3;
             // 
             // richTextBox1
@@ -114,7 +114,7 @@
             richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             richTextBox1.Location = new System.Drawing.Point(5, 5);
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new System.Drawing.Size(446, 154);
+            richTextBox1.Size = new System.Drawing.Size(532, 180);
             richTextBox1.TabIndex = 4;
             richTextBox1.Text = resources.GetString("richTextBox1.Text");
             // 
@@ -123,11 +123,11 @@
             buttonGithub.Color = System.Drawing.Color.Black;
             buttonGithub.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 162);
             buttonGithub.ForeColor = System.Drawing.Color.White;
-            buttonGithub.Location = new System.Drawing.Point(90, 367);
+            buttonGithub.Location = new System.Drawing.Point(39, 440);
             buttonGithub.Name = "buttonGithub";
             buttonGithub.Radius = 6;
             buttonGithub.ShadowDepth = 4F;
-            buttonGithub.Size = new System.Drawing.Size(156, 36);
+            buttonGithub.Size = new System.Drawing.Size(178, 49);
             buttonGithub.TabIndex = 4;
             buttonGithub.Text = "Github Sponsor";
             buttonGithub.UseVisualStyleBackColor = true;
@@ -137,11 +137,11 @@
             // 
             buttonBuymeacoffee.Color = System.Drawing.Color.Yellow;
             buttonBuymeacoffee.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 162);
-            buttonBuymeacoffee.Location = new System.Drawing.Point(252, 367);
+            buttonBuymeacoffee.Location = new System.Drawing.Point(222, 440);
             buttonBuymeacoffee.Name = "buttonBuymeacoffee";
             buttonBuymeacoffee.Radius = 6;
             buttonBuymeacoffee.ShadowDepth = 4F;
-            buttonBuymeacoffee.Size = new System.Drawing.Size(156, 36);
+            buttonBuymeacoffee.Size = new System.Drawing.Size(178, 49);
             buttonBuymeacoffee.TabIndex = 4;
             buttonBuymeacoffee.Text = "Buymeacoffee";
             buttonBuymeacoffee.UseVisualStyleBackColor = true;
@@ -152,11 +152,11 @@
             buttonPatreon.Color = System.Drawing.Color.IndianRed;
             buttonPatreon.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 162);
             buttonPatreon.ForeColor = System.Drawing.Color.White;
-            buttonPatreon.Location = new System.Drawing.Point(414, 367);
+            buttonPatreon.Location = new System.Drawing.Point(405, 440);
             buttonPatreon.Name = "buttonPatreon";
             buttonPatreon.Radius = 6;
             buttonPatreon.ShadowDepth = 4F;
-            buttonPatreon.Size = new System.Drawing.Size(132, 36);
+            buttonPatreon.Size = new System.Drawing.Size(178, 49);
             buttonPatreon.TabIndex = 4;
             buttonPatreon.Text = "Patreon";
             buttonPatreon.UseVisualStyleBackColor = true;
@@ -166,22 +166,23 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            ClientSize = new System.Drawing.Size(631, 418);
+            ClientSize = new System.Drawing.Size(624, 507);
+            Controls.Add(label2);
             Controls.Add(buttonPatreon);
             Controls.Add(buttonBuymeacoffee);
             Controls.Add(buttonGithub);
             Controls.Add(panel1);
             Controls.Add(label3);
-            Controls.Add(label2);
             Controls.Add(label1);
             DrawTitleBorder = false;
             Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 162);
-            Hatch = System.Drawing.Drawing2D.HatchStyle.Horizontal;
-            Location = new System.Drawing.Point(0, 0);
+            FullDrawHatch = true;
             MaximizeBox = false;
             MinimizeBox = false;
+            MinimumSize = new System.Drawing.Size(630, 513);
             Movable = false;
             Name = "AboutForm";
+            Padding = new System.Windows.Forms.Padding(0, 40, 0, 0);
             ShowIcon = false;
             ShowInTaskbar = false;
             StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

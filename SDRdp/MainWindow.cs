@@ -6,6 +6,7 @@ using SDUI;
 using SDUI.Controls;
 using SDUI.Helpers;
 using System;
+using System.Configuration;
 using System.Drawing;
 using System.IO;
 using System.Net;
@@ -140,6 +141,7 @@ public partial class MainWindow : UIWindow
             menuItem.Click += SavedConnections_ConnectMenuItem_Click;
 
             formMenuStrip.Items.Add(menuItem);
+            connectionHistory.Add(freeRdpControl.Configuration, SavedConnections_ConnectMenuItem_Click);
         }
 
         if (!Directory.Exists(savedDir))
@@ -156,11 +158,29 @@ public partial class MainWindow : UIWindow
     {
         try
         {
-            var menuItem = sender as ToolStripMenuItem;
-            if (menuItem == null)
+            object tag = null;
+            if (sender is ToolStripMenuItem)
+            {
+                var component = sender as ToolStripMenuItem;
+                if (component == null)
+                    return;
+
+                tag = component.Tag;
+            }
+
+            if (sender is ButtonBase)
+            {
+                var component = sender as ButtonBase;
+                if (component == null)
+                    return;
+
+                tag = component.Tag;
+            }
+
+            if (tag == null)
                 return;
 
-            var configuration = menuItem.Tag as FreeRdpConfiguration;
+            var configuration = tag as FreeRdpConfiguration;
             if (configuration == null)
                 return;
 
@@ -326,7 +346,7 @@ public partial class MainWindow : UIWindow
                     item.Checked = true;
             }
 
-            labelStarting.Visible = pageController.Controls.Count == 0;
+            connectionHistory.Visible = pageController.Controls.Count == 0;
 
             if (pageController.Count == 1)
                 Text = $"{_freeRdpControl.Configuration.Server}@{_freeRdpControl.Configuration.Username}";
@@ -356,9 +376,9 @@ public partial class MainWindow : UIWindow
                     item.Checked = false;
             }
 
-            labelStarting.Visible = pageController.Controls.Count == 0;
+            connectionHistory.Visible = pageController.Controls.Count == 0;
 
-            if (!labelStarting.Visible)
+            if (!connectionHistory.Visible)
                 pageController.SelectedIndex--;
 
             this.Invalidate();
@@ -488,6 +508,7 @@ public partial class MainWindow : UIWindow
                 menuItem.Click += SavedConnections_ConnectMenuItem_Click;
 
                 formMenuStrip.Items.Add(menuItem);
+                connectionHistory.Add(configuration, SavedConnections_ConnectMenuItem_Click);
             }
         }
         catch (Exception ex)
