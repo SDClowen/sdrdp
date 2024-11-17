@@ -198,6 +198,8 @@
             connectionHistory.Name = "connectionHistory";
             connectionHistory.Size = new System.Drawing.Size(1286, 634);
             connectionHistory.TabIndex = 4;
+            connectionHistory.ConnectEventHandler += ConnectMenuItem_Click;
+            connectionHistory.ConnectSavedEventHandler += SavedConnections_ConnectMenuItem_Click;
             // 
             // MainWindow
             // 

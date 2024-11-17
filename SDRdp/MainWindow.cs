@@ -6,7 +6,6 @@ using SDUI;
 using SDUI.Controls;
 using SDUI.Helpers;
 using System;
-using System.Configuration;
 using System.Drawing;
 using System.IO;
 using System.Net;
@@ -17,8 +16,9 @@ namespace SDRdp;
 
 public partial class MainWindow : UIWindow
 {
-    private static readonly Color _lightBackColor = Color.FromArgb(255, 255, 255);
-    private static readonly Color _darkBackColor = Color.FromArgb(16, 16, 16);
+    private readonly Color _lightBackColor = Color.FromArgb(255, 255, 255);
+    private readonly Color _darkBackColor = Color.FromArgb(16, 16, 16);
+    private readonly string savedDir = Path.Combine(Environment.CurrentDirectory, "saved");
 
     private FreeRdpControl _freeRdpControl => pageController.SelectedIndex < 0 ? null :
             pageController.Controls[pageController.SelectedIndex] as FreeRdpControl;
@@ -43,7 +43,7 @@ public partial class MainWindow : UIWindow
         {
             _form.Hide();
 
-            CheckIsSaved(_freeRdpControl);
+            CheckIsSaved(_freeRdpControl.Configuration);
 
             args.Cancel = true;
         };
@@ -106,11 +106,10 @@ public partial class MainWindow : UIWindow
         return false;
     }
 
-    private void CheckIsSaved(FreeRdpControl freeRdpControl)
+    private void CheckIsSaved(FreeRdpConfiguration freeRdpConfiguration)
     {
-        var title = $"{freeRdpControl.Configuration.Server}@{freeRdpControl.Configuration.Username}";
-        var savedDir = Path.Combine(Environment.CurrentDirectory, "saved");
-        var fileName = Path.Combine(savedDir, $"{freeRdpControl.Configuration.Server.Replace(":", "_")}_{freeRdpControl.Configuration.Username}.json");
+        var title = $"{freeRdpConfiguration.Server}@{freeRdpConfiguration.Username}";
+        var fileName = Path.Combine(savedDir, $"{freeRdpConfiguration.Server.Replace(":", "_")}_{freeRdpConfiguration.Username}.json");
 
         //if (File.Exists(fileName))
         //return;
@@ -119,11 +118,11 @@ public partial class MainWindow : UIWindow
         foreach (ToolStripMenuItem item in formMenuStrip.Items)
         {
             var configuration = item.Tag as FreeRdpConfiguration;
-            if (configuration.Server == freeRdpControl.Configuration.Server &&
-                configuration.Username == freeRdpControl.Configuration.Username)
+            if (configuration.Server == freeRdpConfiguration.Server &&
+                configuration.Username == freeRdpConfiguration.Username)
             {
-                item.Tag = freeRdpControl.Configuration;
-                item.Text = freeRdpControl.Text = freeRdpControl.Configuration.Title;
+                item.Tag = freeRdpConfiguration;
+                item.Text = freeRdpConfiguration.Title;
 
                 found = true;
                 break;
@@ -134,24 +133,52 @@ public partial class MainWindow : UIWindow
         {
             var menuItem = new ToolStripMenuItem()
             {
-                Text = freeRdpControl.Configuration.Title,
-                Tag = freeRdpControl.Configuration,
+                Text = freeRdpConfiguration.Title,
+                Tag = freeRdpConfiguration
             };
 
             menuItem.Click += SavedConnections_ConnectMenuItem_Click;
 
             formMenuStrip.Items.Add(menuItem);
-            connectionHistory.Add(freeRdpControl.Configuration, SavedConnections_ConnectMenuItem_Click);
+            connectionHistory.Add(freeRdpConfiguration, removeConnection_Click);
         }
 
         if (!Directory.Exists(savedDir))
             Directory.CreateDirectory(savedDir);
 
-        var freeRdpControlConfiguration = freeRdpControl.Configuration;
+        var freeRdpControlConfiguration = freeRdpConfiguration;
         //freeRdpControlConfiguration.DesktopHeight = freeRdpControlConfiguration.DesktopWidth = 0;
         var serialized = JsonSerializer.Serialize(freeRdpControlConfiguration);
 
         File.WriteAllText(fileName, serialized);
+    }
+
+    private void removeConnection_Click(object sender, EventArgs e)
+    {
+        var component = sender as ButtonBase;
+        if (component == null)
+            return;
+
+        var configuration = component.Tag as FreeRdpConfiguration;
+
+        if (configuration == null)
+            return;
+
+
+        var fileName = Path.Combine(savedDir, $"{configuration.Server.Replace(":", "_")}_{configuration.Username}.json");
+        if(File.Exists(fileName))
+            File.Delete(fileName);
+
+        foreach (ToolStripMenuItem item in formMenuStrip.Items)
+        {
+            var freeRdpConfiguration = item.Tag as FreeRdpConfiguration;
+            if (configuration.Server == freeRdpConfiguration.Server &&
+                configuration.Username == freeRdpConfiguration.Username)
+            {
+                formMenuStrip.Items.Remove(item);
+                break;
+            }
+        }
     }
 
     private void SavedConnections_ConnectMenuItem_Click(object sender, EventArgs e)
@@ -275,7 +302,7 @@ public partial class MainWindow : UIWindow
 
             freeRdpControl.Connect();
 
-            CheckIsSaved(freeRdpControl);
+            CheckIsSaved(freeRdpControl.Configuration);
         }
         catch (Exception ex)
         {
@@ -362,7 +389,7 @@ public partial class MainWindow : UIWindow
         try
         {
             var freeRdpControl = sender as FreeRdpControl;
-            CheckIsSaved(freeRdpControl);
+            CheckIsSaved(freeRdpControl.Configuration);
 
             pageController.Controls.Remove(freeRdpControl);
             if (pageController.Count == 0)
@@ -508,7 +535,7 @@ public partial class MainWindow : UIWindow
                 menuItem.Click += SavedConnections_ConnectMenuItem_Click;
 
                 formMenuStrip.Items.Add(menuItem);
-                connectionHistory.Add(configuration, SavedConnections_ConnectMenuItem_Click);
+                connectionHistory.Add(configuration, removeConnection_Click);
             }
         }
         catch (Exception ex)
