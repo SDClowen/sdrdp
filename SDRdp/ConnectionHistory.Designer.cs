@@ -40,18 +40,20 @@
             flowLayoutPanel.Controls.Add(panel);
             flowLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             flowLayoutPanel.Location = new System.Drawing.Point(0, 0);
+            flowLayoutPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             flowLayoutPanel.Name = "flowLayoutPanel";
-            flowLayoutPanel.Padding = new System.Windows.Forms.Padding(12);
-            flowLayoutPanel.Size = new System.Drawing.Size(1108, 692);
+            flowLayoutPanel.Padding = new System.Windows.Forms.Padding(10, 9, 10, 9);
+            flowLayoutPanel.Size = new System.Drawing.Size(970, 519);
             flowLayoutPanel.TabIndex = 0;
             // 
             // panel
             // 
             panel.Controls.Add(buttonNewConnect);
             flowLayoutPanel.SetFlowBreak(panel, true);
-            panel.Location = new System.Drawing.Point(15, 15);
+            panel.Location = new System.Drawing.Point(13, 11);
+            panel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             panel.Name = "panel";
-            panel.Size = new System.Drawing.Size(136, 181);
+            panel.Size = new System.Drawing.Size(84, 181);
             panel.TabIndex = 0;
             // 
             // buttonNewConnect
@@ -59,11 +61,12 @@
             buttonNewConnect.Color = System.Drawing.Color.DodgerBlue;
             buttonNewConnect.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 162);
             buttonNewConnect.ForeColor = System.Drawing.Color.White;
-            buttonNewConnect.Location = new System.Drawing.Point(25, 54);
+            buttonNewConnect.Location = new System.Drawing.Point(3, 63);
+            buttonNewConnect.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             buttonNewConnect.Name = "buttonNewConnect";
-            buttonNewConnect.Radius = 24;
+            buttonNewConnect.Radius = 32;
             buttonNewConnect.ShadowDepth = 4F;
-            buttonNewConnect.Size = new System.Drawing.Size(88, 72);
+            buttonNewConnect.Size = new System.Drawing.Size(77, 54);
             buttonNewConnect.TabIndex = 0;
             buttonNewConnect.Text = "";
             buttonNewConnect.UseVisualStyleBackColor = true;
@@ -71,11 +74,12 @@
             // 
             // ConnectionHistory
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             Controls.Add(flowLayoutPanel);
+            Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             Name = "ConnectionHistory";
-            Size = new System.Drawing.Size(1108, 692);
+            Size = new System.Drawing.Size(970, 519);
             Load += ConnectionHistory_Load;
             flowLayoutPanel.ResumeLayout(false);
             panel.ResumeLayout(false);

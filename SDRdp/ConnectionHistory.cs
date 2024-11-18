@@ -63,15 +63,15 @@ namespace SDRdp
             // 
             // buttonConnect
             // 
-            buttonConnect.Color = System.Drawing.Color.Transparent;
+            buttonConnect.Color = System.Drawing.Color.Black;
             buttonConnect.Font = new System.Drawing.Font("Segoe UI", 28.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 162);
             buttonConnect.ForeColor = System.Drawing.Color.White;
             buttonConnect.Location = new System.Drawing.Point(104, 52);
             buttonConnect.Name = "buttonConnect";
-            buttonConnect.Radius = 64;
-            buttonConnect.ShadowDepth = 0F;
+            buttonConnect.Radius = 48;
+            buttonConnect.ShadowDepth = 6F;
             buttonConnect.Tag = config;
-            buttonConnect.Size = new System.Drawing.Size(72, 72);
+            buttonConnect.Size = new System.Drawing.Size(64, 64);
             buttonConnect.TabIndex = 4;
             buttonConnect.Text = "▶";
             buttonConnect.UseVisualStyleBackColor = true;
@@ -80,18 +80,23 @@ namespace SDRdp
             buttonRemove.Color = System.Drawing.Color.Red;
             buttonRemove.Font = new System.Drawing.Font("Segoe UI", 9, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 162);
             buttonRemove.ForeColor = System.Drawing.Color.White;
-            buttonRemove.Location = new System.Drawing.Point(connectInfo.Size.Width - 28, 2);
-            buttonRemove.Radius = 24;
+
+            var measure = TextRenderer.MeasureText("✕", buttonRemove.Font);
+            
+            buttonRemove.Location = new System.Drawing.Point(connectInfo.Size.Width - measure.Width - 6, measure.Height / 2 - 3);
+            buttonRemove.Radius = 16;
             buttonRemove.ShadowDepth = 0F;
             buttonRemove.Tag = config;
-            buttonRemove.Size = new System.Drawing.Size(24, 24);
-            buttonRemove.TabIndex = 4;
+            buttonRemove.Size = new System.Drawing.Size(measure.Width, measure.Height);
             buttonRemove.Text = "✕";
             buttonRemove.UseVisualStyleBackColor = true;
-            buttonRemove.Click += removeEventHandler;
             buttonRemove.Click += (sender, e) =>
             {
+                if (MessageBox.Show("Are you sure remove the saved connection?", "Warning", MessageBoxButtons.YesNo) == DialogResult.No)
+                    return;
+
                 flowLayoutPanel.Controls.Remove(connectInfo);
+                removeEventHandler?.Invoke(sender, e);
             };
 
             if (!flowLayoutPanel.Visible)
