@@ -230,7 +230,6 @@
             OnCloseTabBoxClick += MainWindow_OnCloseTabBoxClick;
             OnNewTabBoxClick += ConnectMenuItem_Click;
             FormClosing += FreeRdpForm_FormClosing;
-            Load += MainWindow_Load;
             MenuStrip.ResumeLayout(false);
             panelFullScreen.ResumeLayout(false);
             ResumeLayout(false);

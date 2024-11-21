@@ -161,6 +161,9 @@ public class FreeRdpControl : UserControl
 
         _freeRdpWindowHandle = IntPtr.Zero;
 
+        Configuration.DesktopWidth = Parent.Width;
+        Configuration.DesktopHeight = Parent.Height;
+
         if (Configuration.DesktopWidth == 0 || Configuration.DesktopHeight == 0)
         {
             Configuration.DesktopWidth = ClientSize.Width;

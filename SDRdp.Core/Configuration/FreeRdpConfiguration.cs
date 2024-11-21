@@ -189,6 +189,7 @@ public class FreeRdpConfiguration : IValidatableObject
     /// <summary>
     /// Password: /p:Password
     /// </summary>
+    [Browsable(false)]
     [CommandLineArgument("/p:\"{0}\"", "")]
     public string? Password { get; set; }
 
@@ -317,7 +318,7 @@ public class FreeRdpConfiguration : IValidatableObject
     /// <summary>
     /// SmartReconnect: When enabled, the connection will be re-established to adapt to the new desktop size
     /// </summary>
-    public bool SmartReconnect { get; set; }
+    public bool SmartReconnect { get; set; } = true;
 
     #endregion
     

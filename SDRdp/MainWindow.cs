@@ -2,6 +2,7 @@
 using Ookii.Dialogs.WinForms;
 using SDRdp.Core;
 using SDRdp.Core.Configuration;
+using SDRdp.Core.Cryptography;
 using SDUI;
 using SDUI.Controls;
 using SDUI.Helpers;
@@ -16,6 +17,7 @@ namespace SDRdp;
 
 public partial class MainWindow : UIWindow
 {
+    private string _privateKey = "123456";
     private readonly Color _lightBackColor = Color.FromArgb(255, 255, 255);
     private readonly Color _darkBackColor = Color.FromArgb(16, 16, 16);
     private readonly string savedDir = Path.Combine(Environment.CurrentDirectory, "saved");
@@ -52,6 +54,7 @@ public partial class MainWindow : UIWindow
         {
             Dock = DockStyle.Fill
         };
+
 
         var screen = Screen.FromControl(this);
         Width = screen.WorkingArea.Width * 80 / 100;
@@ -150,7 +153,7 @@ public partial class MainWindow : UIWindow
         //freeRdpControlConfiguration.DesktopHeight = freeRdpControlConfiguration.DesktopWidth = 0;
         var serialized = JsonSerializer.Serialize(freeRdpControlConfiguration);
 
-        File.WriteAllText(fileName, serialized);
+        File.WriteAllText(fileName, Crypto.Encrypt(serialized, _privateKey));
     }
 
     private void removeConnection_Click(object sender, EventArgs e)
@@ -166,7 +169,7 @@ public partial class MainWindow : UIWindow
 
 
         var fileName = Path.Combine(savedDir, $"{configuration.Server.Replace(":", "_")}_{configuration.Username}.json");
-        if(File.Exists(fileName))
+        if (File.Exists(fileName))
             File.Delete(fileName);
 
         foreach (ToolStripMenuItem item in formMenuStrip.Items)
@@ -218,9 +221,7 @@ public partial class MainWindow : UIWindow
             freeRdpControl.VerifyCredentials += FreeRdpControl_VerifyCredentials;
             freeRdpControl.CertificateError += FreeRdpControl_CertificateError;
             freeRdpControl.Dock = DockStyle.Fill;
-
-            freeRdpControl.Configuration.DesktopWidth = pageController.Width;
-            freeRdpControl.Configuration.DesktopHeight = pageController.Height;
+            freeRdpControl.Parent = pageController;
 
             pageController.Controls.Add(freeRdpControl);
             pageController.SelectedIndex = pageController.Count - 1;
@@ -294,8 +295,7 @@ public partial class MainWindow : UIWindow
                 return;
 
             freeRdpControl.Configuration.Title = inputDialogTitle.Input;
-            freeRdpControl.Configuration.DesktopWidth = pageController.Width;
-            freeRdpControl.Configuration.DesktopHeight = pageController.Height;
+            freeRdpControl.Parent = pageController;
 
             pageController.Controls.Add(freeRdpControl);
             pageController.SelectedIndex = pageController.Count - 1;
@@ -309,6 +309,7 @@ public partial class MainWindow : UIWindow
             MessageBox.Show(ex.Message);
         }
     }
+   
     private void DisconnectMenuItem_Click(object sender, EventArgs e)
     {
         if (pageController.Controls.Count == 0)
@@ -478,13 +479,11 @@ public partial class MainWindow : UIWindow
             if (_freeRdpControl == null)
                 return;
 
-            _freeRdpControl.Configuration.SmartReconnect = true;
-
             if (ShowTitle)
             {
                 ShowTitle = false;
                 TopMost = true;
-                this.WindowState = FormWindowState.Normal;
+                this.WindowState = FormWindowState.Maximized;
                 this.FormBorderStyle = FormBorderStyle.None;
                 this.Bounds = Screen.FromControl(this).Bounds;
                 panelFullScreen.Visible = true;
@@ -503,7 +502,6 @@ public partial class MainWindow : UIWindow
                 this.FormBorderStyle = FormBorderStyle.Sizable;
             }
 
-            _freeRdpControl.Configuration.SmartReconnect = false;
         }
         catch (Exception ex)
         {
@@ -511,8 +509,10 @@ public partial class MainWindow : UIWindow
         }
     }
 
-    private void MainWindow_Load(object sender, EventArgs e)
+    protected override void OnShown(EventArgs e)
     {
+        base.OnShown(e);
+
         try
         {
             var savedDir = Path.Combine(Environment.CurrentDirectory, "saved");
@@ -520,10 +520,23 @@ public partial class MainWindow : UIWindow
             if (!Directory.Exists(savedDir))
                 Directory.CreateDirectory(savedDir);
 
-            foreach (var item in Directory.GetFiles(savedDir))
+            using var inputDialogTitle = new Ookii.Dialogs.WinForms.InputDialog();
+            inputDialogTitle.WindowTitle = @"Connections Key";
+            inputDialogTitle.MainInstruction = @"Please enter a key for connections";
+            inputDialogTitle.Content = @"This will be used to encrypt the connections contained here for your security.";
+            inputDialogTitle.UsePasswordMasking = true;
+
+            if (inputDialogTitle.ShowDialog(this) == DialogResult.Cancel ||
+                string.IsNullOrWhiteSpace(inputDialogTitle.Input))
+                Environment.Exit(0);
+
+            _privateKey = inputDialogTitle.Input;
+
+            foreach (var file in Directory.GetFiles(savedDir))
             {
-                var json = File.ReadAllText(item);
-                var configuration = JsonSerializer.Deserialize<FreeRdpConfiguration>(json);
+                var readedJson = Crypto.Decrypt(File.ReadAllText(file), _privateKey);
+                var configuration = JsonSerializer.Deserialize<FreeRdpConfiguration>(readedJson);
+
                 var menuItem = new ToolStripMenuItem()
                 {
                     Text = string.IsNullOrWhiteSpace(configuration.Title) ?
@@ -537,6 +550,11 @@ public partial class MainWindow : UIWindow
                 formMenuStrip.Items.Add(menuItem);
                 connectionHistory.Add(configuration, removeConnection_Click);
             }
+        }
+        catch (JsonException)
+        {
+            MessageBox.Show("Could not extract configuration files with this password. Maybe the password is wrong?");
+            Environment.Exit(0);
         }
         catch (Exception ex)
         {
