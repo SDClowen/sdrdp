@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<Product>SDRdp</Product>
-		<Nullable>enable</Nullable>
+		<Nullable>disable</Nullable>
 		<Copyright>Copyright © $([System.DateTime]::Now.ToString(yyyy)), Mahmut YILDIRIM a.k.a SDClowen</Copyright>
 	</PropertyGroup>
 

@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.Linq;
 using SDRdp.Core.Cryptography;
 using System.Text.Json;
+using System.Text;
 
 namespace SDRdp
 {
@@ -55,6 +56,20 @@ namespace SDRdp
             }
         }
 
+        public void Save()
+        {
+            if (!Directory.Exists(savedDir))
+                Directory.CreateDirectory(savedDir);
+
+            foreach (var freeRdpConfiguration in Configurations)
+            {
+                var fileName = Path.Combine(savedDir, $"{freeRdpConfiguration.Server.Replace(":", "_")}_{freeRdpConfiguration.Username}.json");
+
+                var serialized = JsonSerializer.Serialize(freeRdpConfiguration);
+                File.WriteAllText(fileName, Crypto.Encrypt(serialized, PrivateKey));
+            }
+        }
+
         public void CheckIsSaved(FreeRdpConfiguration freeRdpConfiguration)
         {
             var title = $"{freeRdpConfiguration.Server}@{freeRdpConfiguration.Username}";
@@ -78,7 +93,7 @@ namespace SDRdp
                     break;
                 }
             }
-            
+
             if (!Directory.Exists(savedDir))
                 Directory.CreateDirectory(savedDir);
 
@@ -94,6 +109,8 @@ namespace SDRdp
                 var fileName = Path.Combine(savedDir, $"{configuration.Server.Replace(":", "_")}_{configuration.Username}.json");
                 if (File.Exists(fileName))
                     File.Delete(fileName);
+
+                Configurations.Remove(configuration);
 
                 return true;
             }
@@ -125,6 +142,84 @@ namespace SDRdp
         private void buttonNewConnect_Click(object sender, EventArgs e)
         {
             ConnectEventHandler?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void buttonImport_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var selectFileDialog = new OpenFileDialog();
+                selectFileDialog.Title = "Select importing file";
+                selectFileDialog.Filter = "SDRDP File | *.sdrdp";
+
+                if (selectFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    using var inputDialog = new Ookii.Dialogs.WinForms.InputDialog();
+                    inputDialog.WindowTitle = @"Connections Key";
+                    inputDialog.MainInstruction = @"Please enter a key for connections";
+                    inputDialog.Content = @"This will be used to encrypt the connections contained here for your security.";
+                    inputDialog.UsePasswordMasking = true;
+
+                    if (inputDialog.ShowDialog(this) == DialogResult.Cancel ||
+                        string.IsNullOrWhiteSpace(inputDialog.Input))
+                        return;
+
+                    var lines = File.ReadAllLines(selectFileDialog.FileName);
+                    foreach (var line in lines)
+                    {
+                        var freeRdpConfiguration = JsonSerializer.Deserialize<FreeRdpConfiguration>(Crypto.Decrypt(line, inputDialog.Input));
+                        Add(freeRdpConfiguration);
+                    }
+                }
+            }
+            catch (JsonException)
+            {
+                MessageBox.Show("Could not extract configuration files with this password. Maybe the password is wrong?");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void buttonExport_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var fileDialog = new SaveFileDialog();
+                fileDialog.Title = "Select saving path for exported file";
+                fileDialog.Filter = "SDRDP File | *.sdrdp";
+
+                if (fileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    using var inputDialog = new Ookii.Dialogs.WinForms.InputDialog();
+                    inputDialog.WindowTitle = @"Connections Key";
+                    inputDialog.MainInstruction = @"Please enter a key for connections";
+                    inputDialog.Content = @"This will be used to encrypt the connections contained here for your security.";
+                    inputDialog.UsePasswordMasking = true;
+
+                    if (inputDialog.ShowDialog(this) == DialogResult.Cancel ||
+                        string.IsNullOrWhiteSpace(inputDialog.Input))
+                        return;
+
+                    var builder = new StringBuilder();
+                    foreach (var freeRdpConfiguration in Configurations)
+                    {
+                        var encrypted = Crypto.Encrypt(JsonSerializer.Serialize(freeRdpConfiguration), inputDialog.Input);
+                        builder.AppendLine(encrypted);
+                    }
+
+                    File.WriteAllText(fileDialog.FileName, builder.ToString());
+                }
+            }
+            catch (JsonException)
+            {
+                MessageBox.Show("Could not extract configuration files with this password. Maybe the password is wrong?");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }

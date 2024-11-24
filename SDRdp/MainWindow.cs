@@ -2,11 +2,11 @@
 using Ookii.Dialogs.WinForms;
 using SDRdp.Core;
 using SDRdp.Core.Configuration;
-using SDRdp.Core.Cryptography;
 using SDUI;
 using SDUI.Controls;
 using SDUI.Helpers;
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Net;
@@ -60,6 +60,18 @@ public partial class MainWindow : UIWindow
         Height = screen.WorkingArea.Height * 85 / 100;
 
         //Gradient = [ColorTranslator.FromHtml("#0968e5"), ColorTranslator.FromHtml("#091970")];
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        base.OnClosing(e);
+
+        connections.Save();
+
+        if (ConfirmUserBeforeClosing())
+            Environment.Exit(0);
+        else
+            e.Cancel = true;
     }
 
     private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
@@ -442,14 +454,6 @@ public partial class MainWindow : UIWindow
         _propertyGrid.SelectedObject = _freeRdpControl.Configuration;
         Text = $"{_freeRdpControl.Configuration.Server}@{_freeRdpControl.Configuration.Username}";
         ResetZoomMenuItem.Text = $"&Reset Zoom ({_freeRdpControl.Zoom}%)";
-    }
-
-    private void FreeRdpForm_FormClosing(object sender, FormClosingEventArgs e)
-    {
-        if (ConfirmUserBeforeClosing())
-            Environment.Exit(0);
-        else
-            e.Cancel = true;
     }
 
     private void buttonFullScreen_Click(object sender, EventArgs e)

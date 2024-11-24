@@ -35,13 +35,20 @@
             label1 = new SDUI.Controls.Label();
             buttonExport = new SDUI.Controls.Button();
             buttonImport = new SDUI.Controls.Button();
+            splitContainer = new System.Windows.Forms.SplitContainer();
+            flowLayoutPanelFavorited = new System.Windows.Forms.FlowLayoutPanel();
             panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer).BeginInit();
+            splitContainer.Panel1.SuspendLayout();
+            splitContainer.Panel2.SuspendLayout();
+            splitContainer.SuspendLayout();
             SuspendLayout();
             // 
             // flowLayoutPanel
             // 
+            flowLayoutPanel.AutoScroll = true;
             flowLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            flowLayoutPanel.Location = new System.Drawing.Point(0, 96);
+            flowLayoutPanel.Location = new System.Drawing.Point(0, 0);
             flowLayoutPanel.Name = "flowLayoutPanel";
             flowLayoutPanel.Padding = new System.Windows.Forms.Padding(11, 12, 11, 12);
             flowLayoutPanel.Size = new System.Drawing.Size(1109, 596);
@@ -116,6 +123,7 @@
             buttonExport.TabIndex = 0;
             buttonExport.Text = "Export Settings";
             buttonExport.UseVisualStyleBackColor = true;
+            buttonExport.Click += buttonExport_Click;
             // 
             // buttonImport
             // 
@@ -130,17 +138,52 @@
             buttonImport.TabIndex = 0;
             buttonImport.Text = "Import Settings";
             buttonImport.UseVisualStyleBackColor = true;
+            buttonImport.Click += buttonImport_Click;
+            // 
+            // splitContainer
+            // 
+            splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            splitContainer.Location = new System.Drawing.Point(0, 96);
+            splitContainer.Name = "splitContainer";
+            splitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer.Panel1
+            // 
+            splitContainer.Panel1.Controls.Add(flowLayoutPanelFavorited);
+            splitContainer.Panel1Collapsed = true;
+            splitContainer.Panel1MinSize = 0;
+            // 
+            // splitContainer.Panel2
+            // 
+            splitContainer.Panel2.Controls.Add(flowLayoutPanel);
+            splitContainer.Size = new System.Drawing.Size(1109, 596);
+            splitContainer.SplitterDistance = 185;
+            splitContainer.SplitterWidth = 2;
+            splitContainer.TabIndex = 2;
+            // 
+            // flowLayoutPanelFavorited
+            // 
+            flowLayoutPanelFavorited.AutoScroll = true;
+            flowLayoutPanelFavorited.Dock = System.Windows.Forms.DockStyle.Fill;
+            flowLayoutPanelFavorited.Location = new System.Drawing.Point(0, 0);
+            flowLayoutPanelFavorited.Name = "flowLayoutPanelFavorited";
+            flowLayoutPanelFavorited.Size = new System.Drawing.Size(1109, 185);
+            flowLayoutPanelFavorited.TabIndex = 0;
             // 
             // Connections
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            Controls.Add(flowLayoutPanel);
+            Controls.Add(splitContainer);
             Controls.Add(panel1);
             Name = "Connections";
             Size = new System.Drawing.Size(1109, 692);
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
+            splitContainer.Panel1.ResumeLayout(false);
+            splitContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitContainer).EndInit();
+            splitContainer.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -153,5 +196,7 @@
         private SDUI.Controls.Button buttonExport;
         private SDUI.Controls.Separator separator1;
         private SDUI.Controls.Label label1;
+        private System.Windows.Forms.SplitContainer splitContainer;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelFavorited;
     }
 }

@@ -233,7 +233,6 @@
             WindowPageControl = pageController;
             OnCloseTabBoxClick += MainWindow_OnCloseTabBoxClick;
             OnNewTabBoxClick += ConnectMenuItem_Click;
-            FormClosing += FreeRdpForm_FormClosing;
             MenuStrip.ResumeLayout(false);
             panelFullScreen.ResumeLayout(false);
             ResumeLayout(false);

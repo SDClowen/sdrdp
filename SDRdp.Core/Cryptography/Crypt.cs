@@ -9,15 +9,7 @@ namespace SDRdp.Core.Cryptography;
 
 public static class Crypto
 {
-    private static string PrivateKey
-    {
-        get
-        {
-            var key = "3fb7fe5dbb0643caa984f53de6fffd0f";
-
-            return key;
-        }
-    }
+    private static string PrivateKey => "3fb7fe5dbb0643caa984f53de6fffd0f";
 
     private static byte[] CreateAesKey(string inputString)
 
