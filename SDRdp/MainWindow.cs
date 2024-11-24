@@ -17,7 +17,6 @@ namespace SDRdp;
 
 public partial class MainWindow : UIWindow
 {
-    private string _privateKey = "123456";
     private readonly Color _lightBackColor = Color.FromArgb(255, 255, 255);
     private readonly Color _darkBackColor = Color.FromArgb(16, 16, 16);
     private readonly string savedDir = Path.Combine(Environment.CurrentDirectory, "saved");
@@ -25,7 +24,7 @@ public partial class MainWindow : UIWindow
     private FreeRdpControl _freeRdpControl => pageController.SelectedIndex < 0 ? null :
             pageController.Controls[pageController.SelectedIndex] as FreeRdpControl;
 
-    private readonly UIWindow _form;
+    private readonly UIWindow _propertyForm;
     private readonly PropertyGrid _propertyGrid;
     public MainWindow()
     {
@@ -33,7 +32,7 @@ public partial class MainWindow : UIWindow
         SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
         ExtendBox = true;
 
-        _form = new()
+        _propertyForm = new()
         {
             Size = new(640, 640),
             Text = @"Settings",
@@ -41,12 +40,13 @@ public partial class MainWindow : UIWindow
             StartPosition = FormStartPosition.CenterParent
         };
 
-        _form.Closing += (_, args) =>
+        _propertyForm.Closing += (_, args) =>
         {
-            _form.Hide();
+            _propertyForm.Hide();
 
+            _freeRdpControl.Text = _freeRdpControl.Configuration.Title;
             CheckIsSaved(_freeRdpControl.Configuration);
-
+            Invalidate();
             args.Cancel = true;
         };
 
@@ -54,7 +54,6 @@ public partial class MainWindow : UIWindow
         {
             Dock = DockStyle.Fill
         };
-
 
         var screen = Screen.FromControl(this);
         Width = screen.WorkingArea.Width * 80 / 100;
@@ -84,7 +83,7 @@ public partial class MainWindow : UIWindow
     {
         base.OnLoad(e);
         SystemEvents_UserPreferenceChanged(null, new(UserPreferenceCategory.Color));
-        _propertyGrid.Parent = _form;
+        _propertyGrid.Parent = _propertyForm;
     }
 
     private void ExitMenuItem_Click(object sender, EventArgs e)
@@ -114,9 +113,6 @@ public partial class MainWindow : UIWindow
         var title = $"{freeRdpConfiguration.Server}@{freeRdpConfiguration.Username}";
         var fileName = Path.Combine(savedDir, $"{freeRdpConfiguration.Server.Replace(":", "_")}_{freeRdpConfiguration.Username}.json");
 
-        //if (File.Exists(fileName))
-        //return;
-
         var found = false;
         foreach (ToolStripMenuItem item in formMenuStrip.Items)
         {
@@ -143,17 +139,9 @@ public partial class MainWindow : UIWindow
             menuItem.Click += SavedConnections_ConnectMenuItem_Click;
 
             formMenuStrip.Items.Add(menuItem);
-            connectionHistory.Add(freeRdpConfiguration, removeConnection_Click);
         }
 
-        if (!Directory.Exists(savedDir))
-            Directory.CreateDirectory(savedDir);
-
-        var freeRdpControlConfiguration = freeRdpConfiguration;
-        //freeRdpControlConfiguration.DesktopHeight = freeRdpControlConfiguration.DesktopWidth = 0;
-        var serialized = JsonSerializer.Serialize(freeRdpControlConfiguration);
-
-        File.WriteAllText(fileName, Crypto.Encrypt(serialized, _privateKey));
+        connections.CheckIsSaved(freeRdpConfiguration);
     }
 
     private void removeConnection_Click(object sender, EventArgs e)
@@ -163,14 +151,8 @@ public partial class MainWindow : UIWindow
             return;
 
         var configuration = component.Tag as FreeRdpConfiguration;
-
         if (configuration == null)
             return;
-
-
-        var fileName = Path.Combine(savedDir, $"{configuration.Server.Replace(":", "_")}_{configuration.Username}.json");
-        if (File.Exists(fileName))
-            File.Delete(fileName);
 
         foreach (ToolStripMenuItem item in formMenuStrip.Items)
         {
@@ -301,8 +283,6 @@ public partial class MainWindow : UIWindow
             pageController.SelectedIndex = pageController.Count - 1;
 
             freeRdpControl.Connect();
-
-            CheckIsSaved(freeRdpControl.Configuration);
         }
         catch (Exception ex)
         {
@@ -352,8 +332,8 @@ public partial class MainWindow : UIWindow
 
         _propertyGrid.SelectedObject = _freeRdpControl?.Configuration;
 
-        if (!_form.Visible)
-            _form.Show(this);
+        if (!_propertyForm.Visible)
+            _propertyForm.Show(this);
     }
 
     private void FreeRdpControl_Connected(object sender, EventArgs e)
@@ -374,7 +354,7 @@ public partial class MainWindow : UIWindow
                     item.Checked = true;
             }
 
-            connectionHistory.Visible = pageController.Controls.Count == 0;
+            connections.Visible = pageController.Controls.Count == 0;
 
             if (pageController.Count == 1)
                 Text = $"{_freeRdpControl.Configuration.Server}@{_freeRdpControl.Configuration.Username}";
@@ -404,9 +384,9 @@ public partial class MainWindow : UIWindow
                     item.Checked = false;
             }
 
-            connectionHistory.Visible = pageController.Controls.Count == 0;
+            connections.Visible = pageController.Controls.Count == 0;
 
-            if (!connectionHistory.Visible)
+            if (!connections.Visible)
                 pageController.SelectedIndex--;
 
             this.Invalidate();
@@ -530,13 +510,11 @@ public partial class MainWindow : UIWindow
                 string.IsNullOrWhiteSpace(inputDialogTitle.Input))
                 Environment.Exit(0);
 
-            _privateKey = inputDialogTitle.Input;
+            connections.PrivateKey = inputDialogTitle.Input;
+            connections.LoadConnections();
 
-            foreach (var file in Directory.GetFiles(savedDir))
+            foreach (var configuration in connections.Configurations)
             {
-                var readedJson = Crypto.Decrypt(File.ReadAllText(file), _privateKey);
-                var configuration = JsonSerializer.Deserialize<FreeRdpConfiguration>(readedJson);
-
                 var menuItem = new ToolStripMenuItem()
                 {
                     Text = string.IsNullOrWhiteSpace(configuration.Title) ?
@@ -548,7 +526,6 @@ public partial class MainWindow : UIWindow
                 menuItem.Click += SavedConnections_ConnectMenuItem_Click;
 
                 formMenuStrip.Items.Add(menuItem);
-                connectionHistory.Add(configuration, removeConnection_Click);
             }
         }
         catch (JsonException)

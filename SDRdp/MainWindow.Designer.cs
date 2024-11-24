@@ -45,7 +45,7 @@
             label1 = new System.Windows.Forms.Label();
             buttonExitFullScreen = new SDUI.Controls.Button();
             formMenuStrip = new SDUI.Controls.ContextMenuStrip();
-            connectionHistory = new ConnectionHistory();
+            connections = new Connections();
             MenuStrip.SuspendLayout();
             panelFullScreen.SuspendLayout();
             SuspendLayout();
@@ -174,6 +174,7 @@
             // 
             buttonExitFullScreen.Color = System.Drawing.Color.Firebrick;
             buttonExitFullScreen.Dock = System.Windows.Forms.DockStyle.Right;
+            buttonExitFullScreen.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 162);
             buttonExitFullScreen.ForeColor = System.Drawing.Color.White;
             buttonExitFullScreen.Location = new System.Drawing.Point(223, 3);
             buttonExitFullScreen.Name = "buttonExitFullScreen";
@@ -191,15 +192,18 @@
             formMenuStrip.Name = "formMenuStrip";
             formMenuStrip.Size = new System.Drawing.Size(61, 4);
             // 
-            // connectionHistory
+            // connections
             // 
-            connectionHistory.Dock = System.Windows.Forms.DockStyle.Fill;
-            connectionHistory.Location = new System.Drawing.Point(1, 47);
-            connectionHistory.Name = "connectionHistory";
-            connectionHistory.Size = new System.Drawing.Size(1286, 634);
-            connectionHistory.TabIndex = 4;
-            connectionHistory.ConnectEventHandler += ConnectMenuItem_Click;
-            connectionHistory.ConnectSavedEventHandler += SavedConnections_ConnectMenuItem_Click;
+            connections.Dock = System.Windows.Forms.DockStyle.Fill;
+            connections.Location = new System.Drawing.Point(1, 47);
+            connections.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            connections.Name = "connections";
+            connections.PrivateKey = "123456";
+            connections.Size = new System.Drawing.Size(1286, 634);
+            connections.TabIndex = 4;
+            connections.ConnectEventHandler += ConnectMenuItem_Click;
+            connections.ConnectSavedEventHandler += SavedConnections_ConnectMenuItem_Click;
+            connections.RemoveConnectionEventHandler += removeConnection_Click;
             // 
             // MainWindow
             // 
@@ -207,7 +211,7 @@
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             ClientSize = new System.Drawing.Size(1288, 682);
             Controls.Add(panelFullScreen);
-            Controls.Add(connectionHistory);
+            Controls.Add(connections);
             Controls.Add(pageController);
             DrawTabIcons = true;
             DrawTitleBorder = false;
@@ -252,6 +256,6 @@
         private System.Windows.Forms.Label label1;
         private SDUI.Controls.Button buttonExitFullScreen;
         private SDUI.Controls.ContextMenuStrip formMenuStrip;
-        private ConnectionHistory connectionHistory;
+        private Connections connections;
     }
 }
