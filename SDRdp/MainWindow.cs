@@ -26,6 +26,9 @@ public partial class MainWindow : UIWindow
 
     private readonly UIWindow _propertyForm;
     private readonly PropertyGrid _propertyGrid;
+
+    private Padding _tempPadding;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -467,15 +470,19 @@ public partial class MainWindow : UIWindow
             {
                 ShowTitle = false;
                 TopMost = true;
+                _tempPadding = Padding;
+                Padding = new(0);
+
+                this.MaximizedBounds = Screen.FromHandle(this.Handle).Bounds; ;
                 this.WindowState = FormWindowState.Maximized;
-                this.FormBorderStyle = FormBorderStyle.None;
-                this.Bounds = Screen.FromControl(this).Bounds;
+
                 panelFullScreen.Visible = true;
                 panelFullScreen.Location = new Point(Width / 2 - panelFullScreen.Width / 2, 0);
                 panelFullScreen.BringToFront();
             }
             else
             {
+                Padding = _tempPadding;
                 panelFullScreen.Visible = false;
                 TopMost = false;
                 ShowTitle = true;
@@ -485,7 +492,6 @@ public partial class MainWindow : UIWindow
                 this.WindowState = FormWindowState.Normal;
                 this.FormBorderStyle = FormBorderStyle.Sizable;
             }
-
         }
         catch (Exception ex)
         {
