@@ -7,16 +7,13 @@
         <PackageProjectUrl>https://github.com/sdclowen/sdrdp</PackageProjectUrl>
         <RepositoryUrl>https://github.com/sdclowen/sdrdp</RepositoryUrl>
         <Nullable>disable</Nullable>
-        <LangVersion>10</LangVersion>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <TargetFrameworks>net8.0-windows;net9.0-windows</TargetFrameworks>
-        <RuntimeIdentifier Condition="$(Platform) == 'x64'">win-x64</RuntimeIdentifier>
-        <RuntimeIdentifier Condition="$(Platform) == 'ARM64'">win-arm64</RuntimeIdentifier>
-        <UseWindowsForms>true</UseWindowsForms>
-        <IncludeSymbols>true</IncludeSymbols>
-    </PropertyGroup>
+        <LangVersion>latest</LangVersion>
+		<TargetFrameworks>net8.0-windows;net9.0-windows</TargetFrameworks>
+		<RuntimeIdentifier Condition="$(Platform) == 'x64'">win-x64</RuntimeIdentifier>
+		<RuntimeIdentifier Condition="$(Platform) == 'ARM64'">win-arm64</RuntimeIdentifier>
+		<UseWindowsForms>true</UseWindowsForms>
+		<IncludeSymbols>true</IncludeSymbols>
+	</PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <DebugType>pdbonly</DebugType>
@@ -32,6 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="BouncyCastle.Cryptography" Version="2.4.0" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
         <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106">
             <PrivateAssets>all</PrivateAssets>
