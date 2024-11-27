@@ -28,42 +28,31 @@
         /// </summary>
         private void InitializeComponent()
         {
-            flowLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
             buttonNewConnect = new SDUI.Controls.Button();
             panel1 = new System.Windows.Forms.Panel();
             separator1 = new SDUI.Controls.Separator();
-            label1 = new SDUI.Controls.Label();
             buttonExport = new SDUI.Controls.Button();
             buttonImport = new SDUI.Controls.Button();
-            splitContainer = new System.Windows.Forms.SplitContainer();
-            flowLayoutPanelFavorited = new System.Windows.Forms.FlowLayoutPanel();
+            groups = new ConnectionGroups();
+            contextMenuConnectionItem = new SDUI.Controls.ContextMenuStrip();
+            moveToGroupMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            panel2 = new System.Windows.Forms.Panel();
             panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)splitContainer).BeginInit();
-            splitContainer.Panel1.SuspendLayout();
-            splitContainer.Panel2.SuspendLayout();
-            splitContainer.SuspendLayout();
+            contextMenuConnectionItem.SuspendLayout();
+            panel2.SuspendLayout();
             SuspendLayout();
-            // 
-            // flowLayoutPanel
-            // 
-            flowLayoutPanel.AutoScroll = true;
-            flowLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            flowLayoutPanel.Location = new System.Drawing.Point(0, 0);
-            flowLayoutPanel.Name = "flowLayoutPanel";
-            flowLayoutPanel.Padding = new System.Windows.Forms.Padding(11, 12, 11, 12);
-            flowLayoutPanel.Size = new System.Drawing.Size(1109, 596);
-            flowLayoutPanel.TabIndex = 0;
             // 
             // buttonNewConnect
             // 
             buttonNewConnect.Color = System.Drawing.Color.DodgerBlue;
             buttonNewConnect.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 162);
             buttonNewConnect.ForeColor = System.Drawing.Color.White;
-            buttonNewConnect.Location = new System.Drawing.Point(14, 4);
+            buttonNewConnect.Location = new System.Drawing.Point(12, 3);
+            buttonNewConnect.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             buttonNewConnect.Name = "buttonNewConnect";
             buttonNewConnect.Radius = 8;
             buttonNewConnect.ShadowDepth = 8F;
-            buttonNewConnect.Size = new System.Drawing.Size(120, 42);
+            buttonNewConnect.Size = new System.Drawing.Size(105, 32);
             buttonNewConnect.TabIndex = 0;
             buttonNewConnect.Text = " Connect";
             buttonNewConnect.UseVisualStyleBackColor = true;
@@ -71,55 +60,34 @@
             // 
             // panel1
             // 
-            panel1.Controls.Add(buttonNewConnect);
             panel1.Controls.Add(separator1);
-            panel1.Controls.Add(label1);
+            panel1.Controls.Add(buttonNewConnect);
             panel1.Controls.Add(buttonExport);
             panel1.Controls.Add(buttonImport);
             panel1.Dock = System.Windows.Forms.DockStyle.Top;
             panel1.Location = new System.Drawing.Point(0, 0);
-            panel1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             panel1.Name = "panel1";
-            panel1.Size = new System.Drawing.Size(1109, 96);
+            panel1.Size = new System.Drawing.Size(970, 40);
             panel1.TabIndex = 1;
             // 
             // separator1
             // 
             separator1.Dock = System.Windows.Forms.DockStyle.Bottom;
             separator1.IsVertical = false;
-            separator1.Location = new System.Drawing.Point(0, 88);
-            separator1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            separator1.Location = new System.Drawing.Point(0, 34);
             separator1.Name = "separator1";
-            separator1.Size = new System.Drawing.Size(1109, 8);
-            separator1.TabIndex = 2;
-            // 
-            // label1
-            // 
-            label1.ApplyGradient = false;
-            label1.AutoSize = true;
-            label1.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 162);
-            label1.Gradient = new System.Drawing.Color[]
-    {
-    System.Drawing.Color.Gray,
-    System.Drawing.Color.Black
-    };
-            label1.GradientAnimation = false;
-            label1.Location = new System.Drawing.Point(18, 51);
-            label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(147, 32);
-            label1.TabIndex = 1;
-            label1.Text = "Connections";
+            separator1.Size = new System.Drawing.Size(970, 6);
+            separator1.TabIndex = 1;
             // 
             // buttonExport
             // 
             buttonExport.Color = System.Drawing.Color.Transparent;
             buttonExport.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 162);
-            buttonExport.Location = new System.Drawing.Point(294, 4);
-            buttonExport.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            buttonExport.Location = new System.Drawing.Point(257, 3);
             buttonExport.Name = "buttonExport";
             buttonExport.Radius = 8;
             buttonExport.ShadowDepth = 8F;
-            buttonExport.Size = new System.Drawing.Size(147, 42);
+            buttonExport.Size = new System.Drawing.Size(129, 32);
             buttonExport.TabIndex = 0;
             buttonExport.Text = "Export Settings";
             buttonExport.UseVisualStyleBackColor = true;
@@ -129,74 +97,79 @@
             // 
             buttonImport.Color = System.Drawing.Color.Transparent;
             buttonImport.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 162);
-            buttonImport.Location = new System.Drawing.Point(140, 4);
-            buttonImport.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            buttonImport.Location = new System.Drawing.Point(122, 3);
             buttonImport.Name = "buttonImport";
             buttonImport.Radius = 8;
             buttonImport.ShadowDepth = 8F;
-            buttonImport.Size = new System.Drawing.Size(147, 42);
+            buttonImport.Size = new System.Drawing.Size(129, 32);
             buttonImport.TabIndex = 0;
             buttonImport.Text = "Import Settings";
             buttonImport.UseVisualStyleBackColor = true;
             buttonImport.Click += buttonImport_Click;
             // 
-            // splitContainer
+            // groups
             // 
-            splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            splitContainer.Location = new System.Drawing.Point(0, 96);
-            splitContainer.Name = "splitContainer";
-            splitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            groups.Dock = System.Windows.Forms.DockStyle.Fill;
+            groups.Location = new System.Drawing.Point(10, 10);
+            groups.Name = "groups";
+            groups.Padding = new System.Windows.Forms.Padding(0, 30, 0, 0);
+            groups.RenderNewPageButton = true;
+            groups.RenderPageClose = true;
+            groups.RenderPageIcon = true;
+            groups.SelectedIndex = -1;
+            groups.Size = new System.Drawing.Size(950, 459);
+            groups.TabIndex = 2;
+            groups.NewPageButtonClicked += groups_NewPageButtonClicked;
+            groups.ClosePageButtonClicked += groups_ClosePageButtonClicked;
             // 
-            // splitContainer.Panel1
+            // contextMenuConnectionItem
             // 
-            splitContainer.Panel1.Controls.Add(flowLayoutPanelFavorited);
-            splitContainer.Panel1Collapsed = true;
-            splitContainer.Panel1MinSize = 0;
+            contextMenuConnectionItem.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 162);
+            contextMenuConnectionItem.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { moveToGroupMenuItem });
+            contextMenuConnectionItem.Name = "contextMenuConnectionItem";
+            contextMenuConnectionItem.Size = new System.Drawing.Size(169, 26);
             // 
-            // splitContainer.Panel2
+            // moveToGroupMenuItem
             // 
-            splitContainer.Panel2.Controls.Add(flowLayoutPanel);
-            splitContainer.Size = new System.Drawing.Size(1109, 596);
-            splitContainer.SplitterDistance = 185;
-            splitContainer.SplitterWidth = 2;
-            splitContainer.TabIndex = 2;
+            moveToGroupMenuItem.ForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
+            moveToGroupMenuItem.Name = "moveToGroupMenuItem";
+            moveToGroupMenuItem.Size = new System.Drawing.Size(168, 22);
+            moveToGroupMenuItem.Text = "Move To Group";
             // 
-            // flowLayoutPanelFavorited
+            // panel2
             // 
-            flowLayoutPanelFavorited.AutoScroll = true;
-            flowLayoutPanelFavorited.Dock = System.Windows.Forms.DockStyle.Fill;
-            flowLayoutPanelFavorited.Location = new System.Drawing.Point(0, 0);
-            flowLayoutPanelFavorited.Name = "flowLayoutPanelFavorited";
-            flowLayoutPanelFavorited.Size = new System.Drawing.Size(1109, 185);
-            flowLayoutPanelFavorited.TabIndex = 0;
+            panel2.Controls.Add(groups);
+            panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            panel2.Location = new System.Drawing.Point(0, 40);
+            panel2.Name = "panel2";
+            panel2.Padding = new System.Windows.Forms.Padding(10);
+            panel2.Size = new System.Drawing.Size(970, 479);
+            panel2.TabIndex = 3;
             // 
             // Connections
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            Controls.Add(splitContainer);
+            Controls.Add(panel2);
             Controls.Add(panel1);
+            Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             Name = "Connections";
-            Size = new System.Drawing.Size(1109, 692);
+            Size = new System.Drawing.Size(970, 519);
             panel1.ResumeLayout(false);
-            panel1.PerformLayout();
-            splitContainer.Panel1.ResumeLayout(false);
-            splitContainer.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)splitContainer).EndInit();
-            splitContainer.ResumeLayout(false);
+            contextMenuConnectionItem.ResumeLayout(false);
+            panel2.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
-
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel;
         private SDUI.Controls.Button buttonNewConnect;
         private System.Windows.Forms.Panel panel1;
         private SDUI.Controls.Button buttonImport;
         private SDUI.Controls.Button buttonExport;
+        private ConnectionGroups groups;
+        private SDUI.Controls.ContextMenuStrip contextMenuConnectionItem;
+        private System.Windows.Forms.ToolStripMenuItem moveToGroupMenuItem;
         private SDUI.Controls.Separator separator1;
-        private SDUI.Controls.Label label1;
-        private System.Windows.Forms.SplitContainer splitContainer;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelFavorited;
+        private System.Windows.Forms.Panel panel2;
     }
 }

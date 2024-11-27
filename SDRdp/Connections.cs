@@ -8,6 +8,9 @@ using System.Linq;
 using SDRdp.Core.Cryptography;
 using System.Text.Json;
 using System.Text;
+using SDUI.Controls;
+using Ookii.Dialogs.WinForms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace SDRdp
 {
@@ -68,6 +71,9 @@ namespace SDRdp
                 var serialized = JsonSerializer.Serialize(freeRdpConfiguration);
                 File.WriteAllText(fileName, Crypto.Encrypt(serialized, PrivateKey));
             }
+
+            var settingsFile = Path.Combine(Environment.CurrentDirectory, "settings.json");
+            File.WriteAllText(settingsFile, JsonSerializer.Serialize(Settings.Instance));
         }
 
         public void CheckIsSaved(FreeRdpConfiguration freeRdpConfiguration)
@@ -81,18 +87,22 @@ namespace SDRdp
             else
                 configuration = freeRdpConfiguration;
 
-            foreach (ConnectionItem item in flowLayoutPanel.Controls)
+            foreach (Control groupItem in groups.Controls)
             {
-                var frconfiguration = item.Tag as FreeRdpConfiguration;
-                if (frconfiguration.Server == freeRdpConfiguration.Server &&
-                    frconfiguration.Username == freeRdpConfiguration.Username)
+                foreach (ConnectionItem item in groupItem.Controls)
                 {
-                    item.Tag = freeRdpConfiguration;
-                    item.labelName.Text = freeRdpConfiguration.Title;
-                    item.Text = title;
-                    break;
+                    var frconfiguration = item.Tag as FreeRdpConfiguration;
+                    if (frconfiguration.Server == freeRdpConfiguration.Server &&
+                        frconfiguration.Username == freeRdpConfiguration.Username)
+                    {
+                        item.Tag = freeRdpConfiguration;
+                        item.labelName.Text = freeRdpConfiguration.Title;
+                        item.Text = title;
+                        break;
+                    }
                 }
             }
+
 
             if (!Directory.Exists(savedDir))
                 Directory.CreateDirectory(savedDir);
@@ -120,23 +130,64 @@ namespace SDRdp
             }
         }
 
+        public void AddGroup(string group)
+        {
+            groups.Add<FlowLayoutPanel>(group);
+            moveToGroupMenuItem.DropDown.Items.Add(group, null, moveGroup_Click);
+        }
+
+        private void moveGroup_Click(object sender, EventArgs e)
+        {
+            var menuItem = sender as ToolStripMenuItem;
+            var contextMenu = menuItem.OwnerItem.Owner as SDUI.Controls.ContextMenuStrip;
+            var groupName = menuItem.Text;
+
+            var connectionItem = contextMenu.SourceControl as ConnectionItem;
+            if (connectionItem == null)
+                return;
+
+            var cfgs = Configurations;
+            var freeRdpConfiguration = connectionItem.Tag as FreeRdpConfiguration;
+            if (freeRdpConfiguration == null) return;
+
+            if (freeRdpConfiguration.Group == groupName)
+                return;
+
+            var group = groups.Controls.OfType<FlowLayoutPanel>().FirstOrDefault(p => p.Text == freeRdpConfiguration.Group);
+            freeRdpConfiguration.Group = groupName;
+            group.Controls.Remove(connectionItem);
+
+            // moved group
+            group = groups.Controls.OfType<FlowLayoutPanel>().FirstOrDefault(p => p.Text == freeRdpConfiguration.Group);
+            group.Controls.Add(connectionItem);
+        }
+
         public void Add(FreeRdpConfiguration config)
         {
             var title = $"{config.Server}@{config.Username}";
             var connectionItem = new ConnectionItem(title, config);
             connectionItem.ConnectSavedEventHandler += ConnectSavedEventHandler;
+            connectionItem.ContextMenuStrip = contextMenuConnectionItem;
+            var group = groups.Controls.OfType<Control>().FirstOrDefault(c => c.Text == connectionItem.Group);
+
             connectionItem.RemoveConnectionEventHandler += (sender, e) =>
             {
                 if (MessageBox.Show("Are you sure remove the saved connection?", "Warning", MessageBoxButtons.YesNo) == DialogResult.No)
                     return;
 
                 TryRemove(config);
-                flowLayoutPanel.Controls.Remove(connectionItem);
+
+                group?.Controls.Remove(connectionItem);
+
                 RemoveConnectionEventHandler?.Invoke(sender, e);
             };
 
             Configurations.Add(config);
-            flowLayoutPanel.Controls.Add(connectionItem);
+
+            if (group == null)
+                group = groups.Add<FlowLayoutPanel>(connectionItem.Group);
+
+            group.Controls.Add(connectionItem);
         }
 
         private void buttonNewConnect_Click(object sender, EventArgs e)
@@ -220,6 +271,69 @@ namespace SDRdp
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void groups_ClosePageButtonClicked(object deletingTabIndex, EventArgs e)
+        {
+            var index = Convert.ToInt32(deletingTabIndex);
+            var group = groups.Controls[index];
+            if (group.Text == "General")
+            {
+                MessageBox.Show("You cant delete the General group!");
+                return;
+            }
+
+            if (MessageBox.Show("Are you sure to delete the group?", "Warning", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                if (group.Controls.Count > 0)
+                {
+                    var inputDialog = new SDUI.Controls.InputDialog("Select Group", "Select Group", "You have to be select new group for move the connections before deleting....", SDUI.Controls.InputDialog.InputType.Combobox);
+
+                    var currentGroups = Settings.Instance.Groups.Where(p => p != group.Text).Select(p => (object)p).ToArray();
+                    if(currentGroups.Length <= 0)
+                    {
+                        MessageBox.Show("There no have any avaliable group for move current connections! Otherwise you cant remove the group...", "SDRdp");
+                        return;
+                    }    
+
+                    inputDialog.Selector.Items.AddRange(currentGroups);
+                    inputDialog.Selector.SelectedIndex = 0;
+                    inputDialog.Padding = new(5);
+                    if (inputDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        var selectedGroupName = inputDialog.Selector.SelectedItem.ToString();
+
+                        var selectedGroup = groups.Controls.OfType<FlowLayoutPanel>().FirstOrDefault(p => p.Text == selectedGroupName);
+                        selectedGroup.Controls.AddRange(group.Controls.OfType<ConnectionItem>().ToArray());
+                        foreach (var frdpConfig in selectedGroup.Controls.OfType<ConnectionItem>().Select(p => p.Tag as FreeRdpConfiguration))
+                            frdpConfig.Group = selectedGroupName;
+
+                        group.Controls.Clear();
+                    }
+                    else
+                        return;
+                }
+
+                groups.RemoveAt(index);
+                Settings.Instance.Groups.RemoveAt(index);
+                Save();
+            }
+        }
+
+        private void groups_NewPageButtonClicked(object sender, EventArgs e)
+        {
+            using var inputDialog = new Ookii.Dialogs.WinForms.InputDialog();
+            inputDialog.WindowTitle = @"Group Name";
+            inputDialog.MainInstruction = @"Please enter a group name";
+            inputDialog.Content = @"The group will be use for your connections.";
+
+            if (inputDialog.ShowDialog(this) == DialogResult.Cancel ||
+                string.IsNullOrWhiteSpace(inputDialog.Input))
+                return;
+
+            AddGroup(inputDialog.Input);
+
+            Settings.Instance.Groups.Add(inputDialog.Input);
         }
     }
 }

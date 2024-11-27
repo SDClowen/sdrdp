@@ -28,4 +28,10 @@
 		<ProjectReference Include="..\sdui\SDUI\SDUI.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Update="ConnectionGroups.cs">
+	    <SubType>Component</SubType>
+	  </Compile>
+	</ItemGroup>
+
 </Project>

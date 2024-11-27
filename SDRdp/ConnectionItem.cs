@@ -7,6 +7,8 @@ namespace SDRdp
 {
     internal class ConnectionItem : SDUI.Controls.GroupBox
     {
+        internal string Group { get; set; }
+
         public event EventHandler ConnectSavedEventHandler;
         public event EventHandler RemoveConnectionEventHandler;
 
@@ -17,6 +19,8 @@ namespace SDRdp
         internal ConnectionItem(string title, FreeRdpConfiguration config)
             : base()
         {
+            Group = config.Group;
+
             labelName = new SDUI.Controls.Label();
             buttonConnect = new SDUI.Controls.Button();
             buttonRemove = new SDUI.Controls.Button();

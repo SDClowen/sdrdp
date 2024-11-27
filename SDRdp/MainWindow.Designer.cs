@@ -56,14 +56,14 @@
             MenuStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             MenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { ZoomInMenuItem, ZoomOutMenuItem, ResetZoomMenuItem, fullScreenToolStripMenuItem, Separator1, SettingsMenuItem, toolStripSeparator1, aboutToolStripMenuItem, exitToolStripMenuItem });
             MenuStrip.Name = "MenuStrip";
-            MenuStrip.Size = new System.Drawing.Size(247, 212);
+            MenuStrip.Size = new System.Drawing.Size(211, 184);
             MenuStrip.Text = "menuStrip1";
             // 
             // ZoomInMenuItem
             // 
             ZoomInMenuItem.ForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
             ZoomInMenuItem.Name = "ZoomInMenuItem";
-            ZoomInMenuItem.Size = new System.Drawing.Size(246, 28);
+            ZoomInMenuItem.Size = new System.Drawing.Size(210, 24);
             ZoomInMenuItem.Text = "Zoom &In";
             ZoomInMenuItem.Click += ZoomInMenuItem_Click;
             // 
@@ -71,7 +71,7 @@
             // 
             ZoomOutMenuItem.ForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
             ZoomOutMenuItem.Name = "ZoomOutMenuItem";
-            ZoomOutMenuItem.Size = new System.Drawing.Size(246, 28);
+            ZoomOutMenuItem.Size = new System.Drawing.Size(210, 24);
             ZoomOutMenuItem.Text = "Zoom O&ut";
             ZoomOutMenuItem.Click += ZoomOutMenuItem_Click;
             // 
@@ -79,7 +79,7 @@
             // 
             ResetZoomMenuItem.ForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
             ResetZoomMenuItem.Name = "ResetZoomMenuItem";
-            ResetZoomMenuItem.Size = new System.Drawing.Size(246, 28);
+            ResetZoomMenuItem.Size = new System.Drawing.Size(210, 24);
             ResetZoomMenuItem.Text = "&Reset Zoom (100%)";
             ResetZoomMenuItem.Click += ResetZoomMenuItem_Click;
             // 
@@ -87,33 +87,33 @@
             // 
             fullScreenToolStripMenuItem.ForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
             fullScreenToolStripMenuItem.Name = "fullScreenToolStripMenuItem";
-            fullScreenToolStripMenuItem.Size = new System.Drawing.Size(246, 28);
+            fullScreenToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
             fullScreenToolStripMenuItem.Text = "Full Screen";
             fullScreenToolStripMenuItem.Click += buttonFullScreen_Click;
             // 
             // Separator1
             // 
             Separator1.Name = "Separator1";
-            Separator1.Size = new System.Drawing.Size(243, 6);
+            Separator1.Size = new System.Drawing.Size(207, 6);
             // 
             // SettingsMenuItem
             // 
             SettingsMenuItem.ForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
             SettingsMenuItem.Name = "SettingsMenuItem";
-            SettingsMenuItem.Size = new System.Drawing.Size(246, 28);
+            SettingsMenuItem.Size = new System.Drawing.Size(210, 24);
             SettingsMenuItem.Text = "Connection Settings...";
             SettingsMenuItem.Click += SettingsMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new System.Drawing.Size(243, 6);
+            toolStripSeparator1.Size = new System.Drawing.Size(207, 6);
             // 
             // aboutToolStripMenuItem
             // 
             aboutToolStripMenuItem.ForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new System.Drawing.Size(246, 28);
+            aboutToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
             aboutToolStripMenuItem.Text = "About";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
@@ -121,7 +121,7 @@
             // 
             exitToolStripMenuItem.ForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new System.Drawing.Size(246, 28);
+            exitToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += ExitMenuItem_Click;
             // 
@@ -136,11 +136,11 @@
             // 
             pageController.AutoScroll = true;
             pageController.Dock = System.Windows.Forms.DockStyle.Fill;
-            pageController.Location = new System.Drawing.Point(1, 47);
+            pageController.Location = new System.Drawing.Point(0, 38);
             pageController.Margin = new System.Windows.Forms.Padding(0);
             pageController.Name = "pageController";
             pageController.SelectedIndex = -1;
-            pageController.Size = new System.Drawing.Size(1286, 634);
+            pageController.Size = new System.Drawing.Size(1288, 643);
             pageController.TabIndex = 1;
             pageController.SelectedIndexChanged += windowPageControl1_SelectedIndexChanged;
             // 
@@ -150,7 +150,7 @@
             panelFullScreen.BackColor = System.Drawing.Color.FromArgb(200, 0, 0, 0);
             panelFullScreen.Controls.Add(label1);
             panelFullScreen.Controls.Add(buttonExitFullScreen);
-            panelFullScreen.Location = new System.Drawing.Point(504, 41);
+            panelFullScreen.Location = new System.Drawing.Point(505, 41);
             panelFullScreen.Name = "panelFullScreen";
             panelFullScreen.Padding = new System.Windows.Forms.Padding(3);
             panelFullScreen.Size = new System.Drawing.Size(255, 33);
@@ -188,6 +188,8 @@
             // 
             // formMenuStrip
             // 
+            formMenuStrip.DropShadowEnabled = false;
+            formMenuStrip.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 162);
             formMenuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
             formMenuStrip.Name = "formMenuStrip";
             formMenuStrip.Size = new System.Drawing.Size(61, 4);
@@ -195,11 +197,11 @@
             // connections
             // 
             connections.Dock = System.Windows.Forms.DockStyle.Fill;
-            connections.Location = new System.Drawing.Point(1, 47);
-            connections.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            connections.Location = new System.Drawing.Point(0, 38);
+            connections.Margin = new System.Windows.Forms.Padding(0);
             connections.Name = "connections";
             connections.PrivateKey = "123456";
-            connections.Size = new System.Drawing.Size(1286, 634);
+            connections.Size = new System.Drawing.Size(1288, 643);
             connections.TabIndex = 4;
             connections.ConnectEventHandler += ConnectMenuItem_Click;
             connections.ConnectSavedEventHandler += SavedConnections_ConnectMenuItem_Click;
@@ -207,7 +209,7 @@
             // 
             // MainWindow
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
+            AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             ClientSize = new System.Drawing.Size(1288, 682);
             Controls.Add(panelFullScreen);
@@ -225,7 +227,7 @@
             Margin = new System.Windows.Forms.Padding(2);
             Name = "MainWindow";
             NewTabButton = true;
-            Padding = new System.Windows.Forms.Padding(1, 47, 1, 1);
+            Padding = new System.Windows.Forms.Padding(0, 38, 0, 1);
             ShowMenuInsteadOfIcon = true;
             TabCloseButton = true;
             Text = "SDRdp - Not Connected";

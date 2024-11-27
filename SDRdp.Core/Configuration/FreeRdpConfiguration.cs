@@ -15,9 +15,14 @@ namespace SDRdp.Core.Configuration;
 public class FreeRdpConfiguration : IValidatableObject
 {
     /// <summary>
+    /// Rdp Group
+    /// </summary>
+    public string Group { get; set; } = "General";
+
+    /// <summary>
     /// Rdp Title
     /// </summary>
-    public string? Title { get; set; }
+    public string Title { get; set; }
 
     #region --- CLI ---
 

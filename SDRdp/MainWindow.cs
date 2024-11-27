@@ -11,6 +11,7 @@ using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Windows.Forms;
 
 namespace SDRdp;
@@ -304,7 +305,7 @@ public partial class MainWindow : UIWindow
             MessageBox.Show(ex.Message);
         }
     }
-   
+
     private void DisconnectMenuItem_Click(object sender, EventArgs e)
     {
         if (pageController.Controls.Count == 0)
@@ -345,6 +346,22 @@ public partial class MainWindow : UIWindow
         if (pageController.Controls.Count == 0)
             return;
 
+        using var inputDialogTitle = new Ookii.Dialogs.WinForms.InputDialog();
+        inputDialogTitle.WindowTitle = @"Connections Key";
+        inputDialogTitle.MainInstruction = @"Please enter a key for connections";
+        inputDialogTitle.Content = @"This will be used to encrypt the connections contained here for your security.";
+        inputDialogTitle.UsePasswordMasking = true;
+
+        if (inputDialogTitle.ShowDialog(this) == DialogResult.Cancel ||
+            string.IsNullOrWhiteSpace(inputDialogTitle.Input))
+            return;
+
+        if (inputDialogTitle.Input != connections.PrivateKey)
+        {
+            MessageBox.Show("Wrong application password!");
+            return;
+        }
+
         _propertyGrid.SelectedObject = _freeRdpControl?.Configuration;
 
         if (!_propertyForm.Visible)
@@ -382,7 +399,7 @@ public partial class MainWindow : UIWindow
 
     private void FreeRdpControl_Disconnected(object sender, DisconnectEventArgs e)
     {
-        try
+        //try
         {
             var freeRdpControl = sender as FreeRdpControl;
             CheckIsSaved(freeRdpControl.Configuration);
@@ -411,9 +428,9 @@ public partial class MainWindow : UIWindow
 
             MessageBox.Show(this, e.ErrorMessage, @"RDP Session Terminated", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
-        catch (Exception ex)
+        //catch (Exception ex)
         {
-            MessageBox.Show(ex.Message);
+            // MessageBox.Show(ex.Message);
         }
     }
 
@@ -505,6 +522,19 @@ public partial class MainWindow : UIWindow
 
         try
         {
+            var settingsFile = Path.Combine(Environment.CurrentDirectory, "settings.json");
+
+            if (!File.Exists(settingsFile))
+                File.WriteAllText(settingsFile, JsonSerializer.Serialize(Settings.Instance));
+            else
+                Settings.Instance = JsonSerializer.Deserialize<Settings>(File.ReadAllText(settingsFile));
+
+            if (Settings.Instance.Groups.Count == 0)
+                Settings.Instance.Groups.Add("General");
+
+            foreach (var group in Settings.Instance.Groups)
+                connections.AddGroup(group);
+
             var savedDir = Path.Combine(Environment.CurrentDirectory, "saved");
 
             if (!Directory.Exists(savedDir))
