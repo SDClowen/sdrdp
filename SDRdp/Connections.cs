@@ -1,16 +1,15 @@
 ﻿using SDRdp.Core.Configuration;
+using SDRdp.Core.Cryptography;
+using SDRdp.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 using System.Linq;
-using SDRdp.Core.Cryptography;
-using System.Text.Json;
 using System.Text;
-using SDUI.Controls;
-using Ookii.Dialogs.WinForms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Text.Json;
+using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace SDRdp
 {
@@ -56,6 +55,73 @@ namespace SDRdp
                 var readedJson = Crypto.Decrypt(File.ReadAllText(file), PrivateKey);
                 var configuration = JsonSerializer.Deserialize<FreeRdpConfiguration>(readedJson);
                 Add(configuration);
+            }
+
+            var ngRemoteDir = Environment.ExpandEnvironmentVariables("%AppData%\\mRemoteNG Connection Manager\\confCons.xml");
+            if (File.Exists(ngRemoteDir) && !Settings.Instance.IsNRemoteRDPImported)
+            {
+                var dialogResult = MessageBox.Show("mRemoteNG detected on this system! Do you wanna import the connections from that?", "", MessageBoxButtons.YesNo);
+                if (dialogResult != DialogResult.Yes)
+                    return;
+
+                var doc = XDocument.Load(ngRemoteDir);
+                var root = doc.Root;
+                var crypter = new SDRdp.Core.Security.Factories.CryptoProviderFactoryFromXml(doc.Root).Build();
+                var lastContainer = string.Empty;
+
+                var loadedGroups = new Dictionary<string, List<FreeRdpConfiguration>>();
+                xmlNodeLoader(root);
+
+                void xmlNodeLoader(XElement node)
+                {
+                    foreach (var item in node.Descendants("Node"))
+                    {
+                        var type = item.Attribute("Type").Value;
+                        if (type == "Container") // group
+                        {
+                            var containerName = item.Attribute("Name").Value;
+                            if (lastContainer == string.Empty || lastContainer != containerName)
+                            {
+                                lastContainer = containerName;
+                                loadedGroups.TryAdd(containerName, []);
+
+                                //if (item.HasElements)
+                                //  xmlNodeLoader(item);
+                            }
+                        }
+                        else if (type == "Connection")
+                        {
+                            var config = new FreeRdpConfiguration
+                            {
+                                Group = lastContainer,
+                                Title = item.Attribute("Name").Value,
+                                Server = item.Attribute("Hostname").Value,
+                                Port = Convert.ToInt32(item.Attribute("Port").Value),
+                                Domain = item.Attribute("Domain").Value,
+                                Username = item.Attribute("Username").Value,
+                                Password = crypter.Decrypt(item.Attribute("Password").Value, "mR3m".ConvertToSecureString()),
+                            };
+
+                            if (!loadedGroups.TryGetValue(lastContainer, out var list))
+                                loadedGroups.TryAdd(lastContainer, [config]);
+                            else
+                                list.Add(config);
+                        }
+                    }
+                }
+
+                loadedGroups = loadedGroups.Where(p => p.Value.Count != 0).ToDictionary();
+                foreach (var localGroup in loadedGroups)
+                {
+                    Settings.Instance.Groups.Add(localGroup.Key);
+                    AddGroup(localGroup.Key);
+
+                    foreach (var item in localGroup.Value)
+                        Add(item);
+                }
+
+                Settings.Instance.IsNRemoteRDPImported = true;
+                Save();
             }
         }
 
@@ -290,11 +356,11 @@ namespace SDRdp
                     var inputDialog = new SDUI.Controls.InputDialog("Select Group", "Select Group", "You have to be select new group for move the connections before deleting....", SDUI.Controls.InputDialog.InputType.Combobox);
 
                     var currentGroups = Settings.Instance.Groups.Where(p => p != group.Text).Select(p => (object)p).ToArray();
-                    if(currentGroups.Length <= 0)
+                    if (currentGroups.Length <= 0)
                     {
                         MessageBox.Show("There no have any avaliable group for move current connections! Otherwise you cant remove the group...", "SDRdp");
                         return;
-                    }    
+                    }
 
                     inputDialog.Selector.Items.AddRange(currentGroups);
                     inputDialog.Selector.SelectedIndex = 0;

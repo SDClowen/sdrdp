@@ -390,6 +390,8 @@ public partial class MainWindow : UIWindow
 
             if (pageController.Count == 1)
                 Text = $"{_freeRdpControl.Configuration.Server}@{_freeRdpControl.Configuration.Username}";
+
+            freeRdpControl.ScreenShot();
         }
         catch (Exception ex)
         {

@@ -419,4 +419,9 @@ public class FreeRdpConfiguration : IValidatableObject
         if (AdditionalArguments != null && !string.IsNullOrWhiteSpace(AdditionalArguments))
             yield return AdditionalArguments.Trim();
     }
+
+    public override string ToString()
+    {
+        return $"{Group}::{Domain}\\{Server}:{Port}@{Username}";
+    }
 }

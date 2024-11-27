@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Management.Automation.Runspaces;
+using System.Management.Automation;
+using System.Security;
 using System.Windows.Forms;
+using System.Collections.ObjectModel;
 
 namespace SDRdp;
 
