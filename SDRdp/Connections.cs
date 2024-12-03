@@ -50,21 +50,30 @@ namespace SDRdp
 
         public void LoadConnections()
         {
-            foreach (var file in Directory.GetFiles(savedDir))
+            foreach (var file in Directory.GetFiles(savedDir, "*.json"))
             {
                 var readedJson = Crypto.Decrypt(File.ReadAllText(file), PrivateKey);
                 var configuration = JsonSerializer.Deserialize<FreeRdpConfiguration>(readedJson);
                 Add(configuration);
             }
 
-            var ngRemoteDir = Environment.ExpandEnvironmentVariables("%AppData%\\mRemoteNG Connection Manager\\confCons.xml");
-            if (File.Exists(ngRemoteDir) && !Settings.Instance.IsNRemoteRDPImported)
+            string[] dirs = [
+                Environment.ExpandEnvironmentVariables("%AppData%\\mRemoteNG\\confCons.xml"), // old version
+                Environment.ExpandEnvironmentVariables("%AppData%\\mRemoteNG Connection Manager\\confCons.xml")
+            ];
+
+            var xmldir = string.Empty;
+            foreach (var dir in dirs)
+                if (File.Exists(dir))
+                    xmldir = dir;
+
+            if (!string.IsNullOrEmpty(xmldir) && !Settings.Instance.IsNRemoteRDPImported)
             {
                 var dialogResult = MessageBox.Show("mRemoteNG detected on this system! Do you wanna import the connections from that?", "", MessageBoxButtons.YesNo);
                 if (dialogResult != DialogResult.Yes)
                     return;
 
-                var doc = XDocument.Load(ngRemoteDir);
+                var doc = XDocument.Load(xmldir);
                 var root = doc.Root;
                 var crypter = new SDRdp.Core.Security.Factories.CryptoProviderFactoryFromXml(doc.Root).Build();
                 var lastContainer = string.Empty;
@@ -101,6 +110,9 @@ namespace SDRdp
                                 Username = item.Attribute("Username").Value,
                                 Password = crypter.Decrypt(item.Attribute("Password").Value, "mR3m".ConvertToSecureString()),
                             };
+
+                            if(string.IsNullOrWhiteSpace(lastContainer))
+                                lastContainer = "General";
 
                             if (!loadedGroups.TryGetValue(lastContainer, out var list))
                                 loadedGroups.TryAdd(lastContainer, [config]);
@@ -162,8 +174,15 @@ namespace SDRdp
                         frconfiguration.Username == freeRdpConfiguration.Username)
                     {
                         item.Tag = freeRdpConfiguration;
-                        item.labelName.Text = freeRdpConfiguration.Title;
+                        item.RName = freeRdpConfiguration.Title;
                         item.Text = title;
+
+                        fileName = Path.ChangeExtension(fileName, "png");
+                        if (File.Exists(fileName))
+                            item.BackgroundImg = Bitmap.FromFile(fileName);
+                        
+                        fileName = Path.ChangeExtension(fileName, "json");
+
                         break;
                     }
                 }
