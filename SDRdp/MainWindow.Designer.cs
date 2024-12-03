@@ -217,6 +217,7 @@
             Controls.Add(pageController);
             DrawTabIcons = true;
             DrawTitleBorder = false;
+            DwmMargin = 0;
             ExtendBox = true;
             ExtendMenu = MenuStrip;
             Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 162);

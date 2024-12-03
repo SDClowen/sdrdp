@@ -152,31 +152,11 @@ public class FreeRdpControl : UserControl
         _timerResizeInProgress.Start();
     }
 
-    public async void ScreenShot()
+    public async void ScreenShot(string path)
     {
         await Task.Delay(15 * 1000);
 
-       /* var bitmap = new Bitmap(_renderTarget.Width, _renderTarget.Height);
-
-        Bitmap BMP = new Bitmap(Screen.PrimaryScreen.Bounds.Width,
-                                            Screen.PrimaryScreen.Bounds.Height,
-                                            PixelFormat.Format32bppArgb);
-        using (Graphics GFX = Graphics.FromImage(BMP))
-        {
-            GFX.CopyFromScreen(Screen.PrimaryScreen.Bounds.X,
-                                Screen.PrimaryScreen.Bounds.Y,
-                                0, 0,
-                                Screen.PrimaryScreen.Bounds.Size,
-                                CopyPixelOperation.SourceCopy);
-        }
-
-        using (Graphics g = Graphics.FromImage(bitmap))
-        {
-            Point np = _renderTarget.PointToScreen(new Point(0, 0));
-            g.DrawImage(BMP, new Rectangle(0, 0, _renderTarget.Width, _renderTarget.Height), new Rectangle(np, _renderTarget.Size), GraphicsUnit.Pixel);
-        }
-
-        bitmap.Save("test.png", System.Drawing.Imaging.ImageFormat.Png);*/
+        WindowHelper.TakeScreenShot(_renderTarget, path);
     }
 
     /// <summary>

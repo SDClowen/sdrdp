@@ -63,7 +63,8 @@ public partial class MainWindow : UIWindow
         Width = screen.WorkingArea.Width * 80 / 100;
         Height = screen.WorkingArea.Height * 85 / 100;
 
-        //Gradient = [ColorTranslator.FromHtml("#0968e5"), ColorTranslator.FromHtml("#091970")];
+        Gradient = [ColorTranslator.FromHtml("#0968e5"), ColorTranslator.FromHtml("#091970")];
+
     }
 
     protected override void OnClosing(CancelEventArgs e)
@@ -98,6 +99,7 @@ public partial class MainWindow : UIWindow
     protected override void OnLoad(EventArgs e)
     {
         base.OnLoad(e);
+
         SystemEvents_UserPreferenceChanged(null, new(UserPreferenceCategory.Color));
         _propertyGrid.Parent = _propertyForm;
     }
@@ -196,9 +198,9 @@ public partial class MainWindow : UIWindow
                 tag = component.Tag;
             }
 
-            if (sender is ButtonBase)
+            if (sender is Control)
             {
-                var component = sender as ButtonBase;
+                var component = sender as Control;
                 if (component == null)
                     return;
 
@@ -391,7 +393,8 @@ public partial class MainWindow : UIWindow
             if (pageController.Count == 1)
                 Text = $"{_freeRdpControl.Configuration.Server}@{_freeRdpControl.Configuration.Username}";
 
-            freeRdpControl.ScreenShot();
+            var fileName = Path.Combine(savedDir, $"{freeRdpControl.Configuration.Server.Replace(":", "_")}_{freeRdpControl.Configuration.Username}.png");
+            freeRdpControl.ScreenShot(fileName);
         }
         catch (Exception ex)
         {
