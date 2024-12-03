@@ -465,7 +465,7 @@ public partial class MainWindow : UIWindow
         credentialDialog.Target = freeRdpControl.Configuration.Server;
         credentialDialog.WindowTitle = @"Credentials Required";
         credentialDialog.MainInstruction = mainInstruction;
-        credentialDialog.Content = @"Note: The FreeRdpControl will throws an exception if no credentials are provided.";
+        credentialDialog.Content = @"Note: The SDRdp will throws an exception if no credentials are provided.";
         credentialDialog.ShowSaveCheckBox = false;
         credentialDialog.ShowDialog(this);
         return credentialDialog.Credentials;
