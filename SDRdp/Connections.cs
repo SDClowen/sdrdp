@@ -217,7 +217,7 @@ namespace SDRdp
 
         public void AddGroup(string group)
         {
-            groups.Add<FlowLayoutPanel>(group);
+            groups.Add<SDUI.Controls.FlowLayoutPanel>(group);
             moveToGroupMenuItem.DropDown.Items.Add(group, null, moveGroup_Click);
         }
 
@@ -238,12 +238,12 @@ namespace SDRdp
             if (freeRdpConfiguration.Group == groupName)
                 return;
 
-            var group = groups.Controls.OfType<FlowLayoutPanel>().FirstOrDefault(p => p.Text == freeRdpConfiguration.Group);
+            var group = groups.Controls.OfType<SDUI.Controls.FlowLayoutPanel>().FirstOrDefault(p => p.Text == freeRdpConfiguration.Group);
             freeRdpConfiguration.Group = groupName;
             group.Controls.Remove(connectionItem);
 
             // moved group
-            group = groups.Controls.OfType<FlowLayoutPanel>().FirstOrDefault(p => p.Text == freeRdpConfiguration.Group);
+            group = groups.Controls.OfType<SDUI.Controls.FlowLayoutPanel>().FirstOrDefault(p => p.Text == freeRdpConfiguration.Group);
             group.Controls.Add(connectionItem);
         }
 
@@ -270,7 +270,7 @@ namespace SDRdp
             Configurations.Add(config);
 
             if (group == null)
-                group = groups.Add<FlowLayoutPanel>(connectionItem.Group);
+                group = groups.Add<SDUI.Controls.FlowLayoutPanel>(connectionItem.Group);
 
             group.Controls.Add(connectionItem);
         }
@@ -388,7 +388,7 @@ namespace SDRdp
                     {
                         var selectedGroupName = inputDialog.Selector.SelectedItem.ToString();
 
-                        var selectedGroup = groups.Controls.OfType<FlowLayoutPanel>().FirstOrDefault(p => p.Text == selectedGroupName);
+                        var selectedGroup = groups.Controls.OfType<SDUI.Controls.FlowLayoutPanel>().FirstOrDefault(p => p.Text == selectedGroupName);
                         selectedGroup.Controls.AddRange(group.Controls.OfType<ConnectionItem>().ToArray());
                         foreach (var frdpConfig in selectedGroup.Controls.OfType<ConnectionItem>().Select(p => p.Tag as FreeRdpConfiguration))
                             frdpConfig.Group = selectedGroupName;

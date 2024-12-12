@@ -7,10 +7,10 @@ using System.Windows.Forms;
 
 namespace SDRdp;
 
-public class ConnectionGroups : System.Windows.Forms.Panel
+public class ConnectionGroups : UserControl
 {
     private float _dpiFactor => DeviceDpi / 96.0f;
-    
+
     private EventHandler<int> _onSelectedIndexChanged;
     private EventHandler _onNewPageButtonClicked;
     private EventHandler _onClosePageButtonClicked;
@@ -120,13 +120,16 @@ public class ConnectionGroups : System.Windows.Forms.Panel
         }
     }
 
-    public T Add<T>(string text) where T : Control
+    public T Add<T>(string text) where T : ScrollableControl
     {
         SuspendLayout();
-        var newPage = Activator.CreateInstance(typeof(T)) as Control;
+        var newPage = Activator.CreateInstance(typeof(T)) as ScrollableControl;
         newPage.Parent = this;
         newPage.Text = text;
         newPage.Visible = false;
+        newPage.AutoScroll = true;
+        newPage.Padding = new(5);
+
         newPage.Dock = DockStyle.Fill;
         Controls.Add(newPage);
 
@@ -186,12 +189,15 @@ public class ConnectionGroups : System.Windows.Forms.Panel
 
         using var borderPen = new Pen(ColorScheme.BorderColor);
 
-        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
         //graphics.DrawLine(borderPen, 2, _headerControlSize.Height, Width - 3, _headerControlSize.Height);
 
+        using var bitmap = new Bitmap(Size.Width, Size.Height);
+        using var gfx = Graphics.FromImage(bitmap);
+
         var i = 0;
-        var _lastTabX = 6 * _dpiFactor;
+        var _lastTabX = 12 * _dpiFactor;
 
         var clientRectangle = new RectangleF(0, 0, Width, Padding.Vertical);
 
@@ -201,17 +207,17 @@ public class ConnectionGroups : System.Windows.Forms.Panel
         using var linePen = ColorScheme.ForeColor.Alpha(100).Pen();
         linePen.Width = 1.5f;
 
+        var radius = 12 * _dpiFactor;
+        gfx.SmoothingMode = SmoothingMode.AntiAlias;
         foreach (Control control in Controls)
         {
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
-
             var stringSize = TextRenderer.MeasureText(control.Text, Font);
             var width = stringSize.Width + 80 * _dpiFactor;
-            RectangleF rectangle = new(_lastTabX, 0, width, Padding.Vertical);
+            RectangleF rectangle = new(_lastTabX, -1, width, Padding.Vertical);
             RectangleF rectangleIcon = new(rectangle.X + 6 * _dpiFactor, rectangle.Height / 2 - 8 * _dpiFactor, 16 * _dpiFactor, 16 * _dpiFactor);
 
             if (i == SelectedIndex)
-                graphics.FillPath(borderPen.Brush, rectangle.Radius(12 * _dpiFactor));
+                gfx.FillPath(borderPen.Brush, rectangle.ChromePath(radius));
 
             RectangleF rectangleClose = new(rectangle.X + rectangle.Width - 24 * _dpiFactor, rectangle.Height / 2 - 8 * _dpiFactor, 16 * _dpiFactor, 16 * _dpiFactor);
             // is mouse in close button
@@ -221,18 +227,18 @@ public class ConnectionGroups : System.Windows.Forms.Panel
 
                 var isMouseHoverOnClose = rectangleClose.Contains(_mouseLocation);
                 if (isMouseHoverOnClose)
-                    graphics.FillPie(closeBrush, rectangleClose.X, rectangleClose.Y, rectangleClose.Width, rectangleClose.Height, 0, 360);
+                    gfx.FillPie(closeBrush, rectangleClose.X, rectangleClose.Y, rectangleClose.Width, rectangleClose.Height, 0, 360);
 
                 using var closePen = new Pen(closeBrush.Color);
 
                 var size = 4f * _dpiFactor;
-                graphics.DrawLine(linePen,
+                gfx.DrawLine(linePen,
                     rectangleClose.Left + rectangleClose.Width / 2 - size,
                     rectangleClose.Top + rectangleClose.Height / 2 - size,
                     rectangleClose.Left + rectangleClose.Width / 2 + size,
                     rectangleClose.Top + rectangleClose.Height / 2 + size);
 
-                graphics.DrawLine(linePen,
+                gfx.DrawLine(linePen,
                     rectangleClose.Left + rectangleClose.Width / 2 - size,
                     rectangleClose.Top + rectangleClose.Height / 2 + size,
                     rectangleClose.Left + rectangleClose.Width / 2 + size,
@@ -253,10 +259,10 @@ public class ConnectionGroups : System.Windows.Forms.Panel
 
             //graphics.CompositingQuality = CompositingQuality.HighQuality;
             //if (_renderPageIcon)
-                //graphics.DrawIcon(SystemIcons.Exclamation, rectangleIcon.ToRectangle());
+            //graphics.DrawIcon(SystemIcons.Exclamation, rectangleIcon.ToRectangle());
 
             i++;
-            control.DrawString(graphics, ColorScheme.ForeColor, rectangle);
+            control.DrawString(gfx, ColorScheme.ForeColor, rectangle);
 
             _lastTabX += rectangle.Width;
         }
@@ -285,24 +291,26 @@ public class ConnectionGroups : System.Windows.Forms.Panel
                     break;
             }
 
-            graphics.FillPath(newPageButtonBrush, newButtonRect.Radius(0, 12, 0, 12));
+            gfx.FillPath(newPageButtonBrush, newButtonRect.Radius(0, 12, 0, 12));
 
             var size = 6 * _dpiFactor;
 
-            graphics.DrawLine(linePen,
+            gfx.DrawLine(linePen,
                 newButtonRect.Left + newButtonRect.Width / 2 - size,
                 newButtonRect.Top + newButtonRect.Height / 2,
                 newButtonRect.Left + newButtonRect.Width / 2 + size,
                 newButtonRect.Top + newButtonRect.Height / 2);
 
-            graphics.DrawLine(linePen,
+            gfx.DrawLine(linePen,
                 newButtonRect.Left + newButtonRect.Width / 2,
                 newButtonRect.Top + newButtonRect.Height / 2 - size,
                 newButtonRect.Left + newButtonRect.Width / 2,
                 newButtonRect.Top + newButtonRect.Height / 2 + size);
         }
 
-        graphics.SmoothingMode = SmoothingMode.Default;
+        //graphics.FillPath(borderPen.Brush, new RectangleF(0, Padding.Vertical, Width, 5).Radius(radius, radius));
+        gfx.SmoothingMode = SmoothingMode.Default;
+        e.Graphics.DrawImage(bitmap, ClientRectangle);
     }
 
     protected override void OnMouseMove(MouseEventArgs e)
