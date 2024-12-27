@@ -189,12 +189,9 @@ public class ConnectionGroups : UserControl
 
         using var borderPen = new Pen(ColorScheme.BorderColor);
 
-        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
         //graphics.DrawLine(borderPen, 2, _headerControlSize.Height, Width - 3, _headerControlSize.Height);
-
-        using var bitmap = new Bitmap(Size.Width, Size.Height);
-        using var gfx = Graphics.FromImage(bitmap);
 
         var i = 0;
         var _lastTabX = 12 * _dpiFactor;
@@ -208,7 +205,7 @@ public class ConnectionGroups : UserControl
         linePen.Width = 1.5f;
 
         var radius = 12 * _dpiFactor;
-        gfx.SmoothingMode = SmoothingMode.AntiAlias;
+        graphics.SmoothingMode = SmoothingMode.AntiAlias;
         foreach (Control control in Controls)
         {
             var stringSize = TextRenderer.MeasureText(control.Text, Font);
@@ -217,7 +214,7 @@ public class ConnectionGroups : UserControl
             RectangleF rectangleIcon = new(rectangle.X + 6 * _dpiFactor, rectangle.Height / 2 - 8 * _dpiFactor, 16 * _dpiFactor, 16 * _dpiFactor);
 
             if (i == SelectedIndex)
-                gfx.FillPath(borderPen.Brush, rectangle.ChromePath(radius));
+                graphics.FillPath(borderPen.Brush, rectangle.ChromePath(radius));
 
             RectangleF rectangleClose = new(rectangle.X + rectangle.Width - 24 * _dpiFactor, rectangle.Height / 2 - 8 * _dpiFactor, 16 * _dpiFactor, 16 * _dpiFactor);
             // is mouse in close button
@@ -227,18 +224,18 @@ public class ConnectionGroups : UserControl
 
                 var isMouseHoverOnClose = rectangleClose.Contains(_mouseLocation);
                 if (isMouseHoverOnClose)
-                    gfx.FillPie(closeBrush, rectangleClose.X, rectangleClose.Y, rectangleClose.Width, rectangleClose.Height, 0, 360);
+                    graphics.FillPie(closeBrush, rectangleClose.X, rectangleClose.Y, rectangleClose.Width, rectangleClose.Height, 0, 360);
 
                 using var closePen = new Pen(closeBrush.Color);
 
                 var size = 4f * _dpiFactor;
-                gfx.DrawLine(linePen,
+                graphics.DrawLine(linePen,
                     rectangleClose.Left + rectangleClose.Width / 2 - size,
                     rectangleClose.Top + rectangleClose.Height / 2 - size,
                     rectangleClose.Left + rectangleClose.Width / 2 + size,
                     rectangleClose.Top + rectangleClose.Height / 2 + size);
 
-                gfx.DrawLine(linePen,
+                graphics.DrawLine(linePen,
                     rectangleClose.Left + rectangleClose.Width / 2 - size,
                     rectangleClose.Top + rectangleClose.Height / 2 + size,
                     rectangleClose.Left + rectangleClose.Width / 2 + size,
@@ -262,7 +259,7 @@ public class ConnectionGroups : UserControl
             //graphics.DrawIcon(SystemIcons.Exclamation, rectangleIcon.ToRectangle());
 
             i++;
-            control.DrawString(gfx, ColorScheme.ForeColor, rectangle);
+            control.DrawString(graphics, ColorScheme.ForeColor, rectangle);
 
             _lastTabX += rectangle.Width;
         }
@@ -291,17 +288,17 @@ public class ConnectionGroups : UserControl
                     break;
             }
 
-            gfx.FillPath(newPageButtonBrush, newButtonRect.Radius(0, 12, 0, 12));
+            graphics.FillPath(newPageButtonBrush, newButtonRect.Radius(0, 12, 0, 12));
 
             var size = 6 * _dpiFactor;
 
-            gfx.DrawLine(linePen,
+            graphics.DrawLine(linePen,
                 newButtonRect.Left + newButtonRect.Width / 2 - size,
                 newButtonRect.Top + newButtonRect.Height / 2,
                 newButtonRect.Left + newButtonRect.Width / 2 + size,
                 newButtonRect.Top + newButtonRect.Height / 2);
 
-            gfx.DrawLine(linePen,
+            graphics.DrawLine(linePen,
                 newButtonRect.Left + newButtonRect.Width / 2,
                 newButtonRect.Top + newButtonRect.Height / 2 - size,
                 newButtonRect.Left + newButtonRect.Width / 2,
@@ -309,8 +306,7 @@ public class ConnectionGroups : UserControl
         }
 
         //graphics.FillPath(borderPen.Brush, new RectangleF(0, Padding.Vertical, Width, 5).Radius(radius, radius));
-        gfx.SmoothingMode = SmoothingMode.Default;
-        e.Graphics.DrawImage(bitmap, ClientRectangle);
+        graphics.SmoothingMode = SmoothingMode.Default;
     }
 
     protected override void OnMouseMove(MouseEventArgs e)
